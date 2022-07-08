@@ -39,6 +39,13 @@ GO111MODULE=on go run ./application/cmd/main.go
  │ Handlers ............. 2  Processes ........... 1 │ 
  │ Prefork ....... Disabled  PID ............. 11610 │ 
  └───────────────────────────────────────────────────┘ 
+
+# 127.0.0.1:8080/swagger/index.html
+```
+
+- docker
+```
+$ make docker.fiber
 ```
 
 ## directory structure
