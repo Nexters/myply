@@ -43,6 +43,10 @@ GO111MODULE=on go run ./application/cmd/main.go
 # 127.0.0.1:8080/swagger/index.html
 ```
 
+## prod
+- https://myply-server-rwwy3wj4sa-de.a.run.app/
+- https://myply-server-rwwy3wj4sa-de.a.run.app/swagger
+
 - docker
 ```
 $ make docker.fiber
