@@ -1,0 +1,100 @@
+@startuml
+title This is about myply's mongo document schema.
+
+!define Table(name,desc) class name as "desc" << (T) >>
+!define pk(x) <color:red><b>x</b></color>
+!define fk(x) <color:blue><b>x</b></color>
+' 초록색: 유니크키
+!define unique(x) <color:green>x</color>
+' 밑줄: not null
+!define not_null(x) <u>x</u>
+
+hide methods
+hide stereotypes
+
+note as N2
+    1. <color:red><b>PK</b></color>
+    2. <color:blue><b>FK</b></color>
+    3. <color:green>Unique Key</color>
+    4. <u>not null</u>
+end note
+
+' entities
+Table(members, "members\n계정") {
+    pk(_id) String device token
+    not_null(name) String 계정이름
+    not_null(memoIds) ObjectID[] 메모 아이디 배열
+    not_null(createdAt) Timestamp
+    not_null(updatedAt) Timestamp
+}
+
+note left
+e.g.
+{
+  "_id": "294913EC-6100-42E8-8C2D-E9F68F286ADE" // deviceToken
+  "name": "leoo.j"
+  "memoIds": ["72cd752dfacb3f1bb551b131", ]
+  "createdAt": ISODate("2022-07-12T22:22:07.636Z"),
+  "updatedAt": ISODate("2022-07-12T22:22:07.636Z")
+}
+end note
+
+Table(memos, "memos\n메모") {
+    pk(_id) ObjectId 메모ID
+    fk(deviceToken) String device token
+    unique(youtubeVideoId) String   유튜브 비디오 ID
+    not_null(body) String 메모글
+    not_null(tagIds) ObjectID[] 태그 아이디 배열
+
+    not_null(createdAt) Timestamp
+    not_null(updatedAt) Timestamp
+}
+
+note right
+e.g.
+{
+  "_id": ObjectId("72cd752dfacb3f1bb551b131"),
+  "deviceToken": "294913EC-6100-42E8-8C2D-E9F68F286ADE"
+  "youtubeVideoId": "RDEM9EK_d1QVhQSYZxYZjvTcgA",
+  "body": "겨울바다 앞에서 잔잔하게 들을 노래 playlist",
+  "tagIds": ["12cd752dfacb3f1bb551b131", "22cd752dfacb3f1bb551b131", "32cd752dfacb3f1bb551b131"]
+  "createdAt": ISODate("2022-07-12T22:22:07.636Z"),
+  "updatedAt": ISODate("2022-07-12T22:22:07.636Z")
+}
+end note
+
+Table(tags, "tags\n태그") {
+    pk(id) int 태그ID
+    unique(keyword) String 키워드명
+
+    not_null(createdAt) Timestamp
+    not_null(updatedAt) Timestamp
+}
+
+note left
+{
+  "_id": ObjectId("12cd752dfacb3f1bb551b131"),
+  "keyword": "잔잔",
+  "createdAt": ISODate("2022-07-12T22:22:07.636Z"),
+  "updatedAt": ISODate("2022-07-12T22:22:07.636Z")
+}
+
+{
+  "_id": ObjectId("22cd752dfacb3f1bb551b131"),
+  "keyword": "겨울바다",
+  "createdAt": ISODate("2022-07-12T22:22:07.636Z"),
+  "updatedAt": ISODate("2022-07-12T22:22:07.636Z")
+}
+
+{
+  "_id": ObjectId("32cd752dfacb3f1bb551b131"),
+  "keyword": "상남자",
+  "createdAt": ISODate("2022-07-12T22:22:07.636Z"),
+  "updatedAt": ISODate("2022-07-12T22:22:07.636Z")
+}
+end note
+
+' one to may relationship
+members "1" --> "0..N" memos : "A member may have\n many memos"
+memos "M" --> "0..N" tags : "Memos may have many tags"
+@enduml
