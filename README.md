@@ -80,6 +80,9 @@ $ make docker.fiber
 - `/doamin`: https://github.com/Sairyss/domain-driven-hexagon#domain-layer
 - `/infrastructure`: https://github.com/Sairyss/domain-driven-hexagon#infrastructure-layer
 
+## uml
+![schema](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Nexters/myply/main/docs/schema.puml)
+
 ## refs
 - unit test guide: [fiber/app_test.go](https://github.com/gofiber/fiber/blob/master/app_test.go)
 - [fiber recipes](https://github.com/gofiber/recipes)
