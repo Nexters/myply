@@ -49,8 +49,8 @@ $ make docker.fiber
 ```
 
 ## prod
-- https://myply-server-rwwy3wj4sa-de.a.run.app/
-- https://myply-server-rwwy3wj4sa-de.a.run.app/swagger
+- https://myply-server-rwwy3wj4sa-du.a.run.app
+- https://myply-server-rwwy3wj4sa-du.a.run.app/swagger
 
 
 ## directory structure
