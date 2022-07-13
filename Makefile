@@ -32,5 +32,5 @@ docker.fiber.build:
 
 docker.fiber:
 	make docker.fiber.build
-	docker run --rm -p 8080:8080 --name $(APP_NAME) fiber
+	docker run --rm -p 8080:8080 --name $(APP_NAME) --env fiber
 

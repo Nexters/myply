@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 
@@ -18,6 +21,9 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
+	cfg := configs.Load()
+	fmt.Printf("%+v\n", cfg)
+
 	app := fiber.New()
 
 	app.Get("/swagger/*", swagger.HandlerDefault)     // swagger
@@ -36,7 +42,7 @@ func main() {
 	}))
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, myply ✈️")
+		return c.SendString(fmt.Sprintf("[%s] Hello, myply ✈️", cfg.Phase))
 	})
 	app.Listen(":8080")
 }

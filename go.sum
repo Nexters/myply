@@ -31,6 +31,8 @@ github.com/gofiber/fiber/v2 v2.34.1/go.mod h1:ozRQfS+D7EL1+hMH+gutku0kfx1wLX4hAx
 github.com/gofiber/swagger v0.0.1 h1:Qwt6uehJffeMG7zla3ampguOPtAW5K4xDAmpaL1qwXk=
 github.com/gofiber/swagger v0.0.1/go.mod h1:gal49FHSULvKAl9Ta+W7fRHdlTWhHPvArmsxKaIdLw4=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
+github.com/joho/godotenv v1.4.0 h1:3l4+N6zfMWnkbPEXKng2o2/MR5mSwTrBih4ZEkkz1lg=
+github.com/joho/godotenv v1.4.0/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=

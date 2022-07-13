@@ -1,4 +1,15 @@
+basePath: /
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: minkj1992@gmail.com
+    name: API Support
+  description: This is a sample swagger for Fiber
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: MYPLY SERVER
+  version: "1.0"
 paths: {}
 swagger: "2.0"
