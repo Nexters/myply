@@ -18,7 +18,7 @@ type Config struct {
 
 const (
 	// Test phase
-	Test Phase = iota
+	Test Phase = iota + 1
 	// Local phase
 	Local
 	// Production phase
