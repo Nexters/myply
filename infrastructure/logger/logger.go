@@ -2,9 +2,12 @@ package logger
 
 import (
 	"github.com/Nexters/myply/infrastructure/configs"
+	"github.com/google/wire"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
+
+var Set = wire.NewSet(NewLogger)
 
 func NewLogger(config *configs.Config) *zap.SugaredLogger {
 	var (
@@ -12,7 +15,6 @@ func NewLogger(config *configs.Config) *zap.SugaredLogger {
 		logger    *zap.Logger
 		err       error
 	)
-
 	switch config.Phase {
 	case configs.Production:
 		zapConfig = zap.NewProductionConfig()
@@ -23,15 +25,12 @@ func NewLogger(config *configs.Config) *zap.SugaredLogger {
 		zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		logger, err = zapConfig.Build()
 	}
+	defer logger.Sync()
 
 	if err != nil {
 		panic(err)
 	}
-
-	appLogger := logger.Sugar()
-	defer appLogger.Sync()
-
-	return appLogger
+	return logger.Sugar()
 }
 
 func getProdEncoderConfig() zapcore.EncoderConfig {

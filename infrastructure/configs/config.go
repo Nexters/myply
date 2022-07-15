@@ -3,8 +3,11 @@ package configs
 import (
 	"os"
 
+	"github.com/google/wire"
 	"github.com/joho/godotenv"
 )
+
+var Set = wire.NewSet(NewConfig)
 
 // Phase is myply server phase type
 type Phase int64

@@ -16,18 +16,20 @@
 
 ## local
 - pre-commit
-  - goimports
-  - golint
-  - gofmt
 
 ```console
 $ cp pre-commit.example .git/hooks/pre-commit
 $ chmod +x .git/hooks/pre-commit
 ```
 
+- setup
+
+```console
+make setup
+```
+
 - run
 ```console
-$ go mod tidy
 $ make local
 GO111MODULE=on go run ./application/cmd/main.go
 
