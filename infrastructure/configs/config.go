@@ -50,8 +50,7 @@ func (p Phase) String() string {
 	return "local"
 }
 
-// Load function loads environment variables by phase.
-func Load() *Config {
+func NewConfig() *Config {
 	phase := parsePhase(os.Getenv("PHASE"))
 
 	if phase == Test {

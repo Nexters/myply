@@ -5,28 +5,27 @@ if [[ "$STAGED_GO_FILES" = "" ]]; then
   exit 0
 fi
 
-PASS=true
+make clean
 
+printf "go lint\n"
 for FILE in $STAGED_GO_FILES
 do
   goimports -w $FILE
-
-  golint "-set_exit_status" $FILE
-  if [[ $? == 1 ]]; then
-    PASS=false
+  # comment|dot imports|ALL_CAPS
+  lintoutput=$(golint "${FILE}" | grep -vE 'comment')
+  
+  if [ -n "$lintoutput" ]; then
+    echo "$lintoutput"
+    exit 1
   fi
 done
 
+printf "go vet\n"
 go vet ./...
 if [[ $? != 0 ]]; then
-  PASS=false
-fi
-
-if ! $PASS; then
   printf "COMMIT FAILED\n"
   exit 1
-else
-  printf "COMMIT SUCCEEDED\n"
 fi
 
+printf "COMMIT SUCCEEDED\n"
 exit 0

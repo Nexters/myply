@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/Nexters/myply/infrastructure/configs"
+	"github.com/Nexters/myply/infrastructure/configs" // TODO: wire
+	"github.com/Nexters/myply/infrastructure/logger"  //TODO: wire
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 
@@ -21,8 +22,10 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
-	cfg := configs.Load()
-	fmt.Printf("%+v\n", cfg)
+	config := configs.NewConfig()
+	logger := logger.NewLogger(config)
+
+	logger.Infof("Configuration settings\n%+v", config)
 
 	app := fiber.New()
 
@@ -33,16 +36,10 @@ func main() {
 		// Expand ("list") or Collapse ("none") tag groups by default
 		DocExpansion: "none",
 		// Prefill OAuth ClientId on Authorize popup
-		OAuth: &swagger.OAuthConfig{
-			AppName:  "OAuth Provider",
-			ClientId: "21bb4edc-05a7-4afc-86f1-2e151e4ba6e2",
-		},
-		// Ability to change OAuth2 redirect uri location
-		OAuth2RedirectUrl: "http://localhost:8080/swagger/oauth2-redirect.html",
 	}))
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString(fmt.Sprintf("[%s] Hello, myply ✈️", cfg.Phase))
+		return c.SendString(fmt.Sprintf("[%s] Hello, myply ✈️", config.Phase))
 	})
 	app.Listen(":8080")
 }

@@ -6,6 +6,12 @@ require (
 	github.com/gofiber/fiber/v2 v2.34.1
 	github.com/gofiber/swagger v0.0.1
 	github.com/swaggo/swag v1.8.3
+	go.uber.org/zap v1.21.0
+)
+
+require (
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
 )
 
 require (
