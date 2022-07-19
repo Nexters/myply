@@ -7,11 +7,16 @@
 package application
 
 import (
+	"context"
 	"fmt"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
+	"github.com/Nexters/myply/infrastructure/persistence"
+	"github.com/Nexters/myply/infrastructure/persistence/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
+	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 )
 
@@ -22,9 +27,19 @@ import (
 // Injectors from server.go:
 
 func New() (*fiber.App, error) {
-	config := configs.NewConfig()
-	sugaredLogger := logger.NewLogger(config)
-	app := NewServer(config, sugaredLogger)
+	config, err := configs.NewConfig()
+	if err != nil {
+		return nil, err
+	}
+	sugaredLogger, err := logger.NewLogger(config)
+	if err != nil {
+		return nil, err
+	}
+	mongoInstance, err := db.NewMongoDB(config)
+	if err != nil {
+		return nil, err
+	}
+	app := NewServer(config, sugaredLogger, mongoInstance)
 	return app, nil
 }
 
@@ -40,10 +55,20 @@ func New() (*fiber.App, error) {
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /
-func NewServer(config *configs.Config, logger2 *zap.SugaredLogger) *fiber.App {
+func NewServer(config *configs.Config, logger2 *zap.SugaredLogger, mongo *db.MongoInstance) *fiber.App {
+
+	collection := mongo.Db.Collection("members")
+	member := persistence.Member{
+		ID:      uuid.NewString(),
+		Name:    "leoo",
+		MemoIDs: []primitive.ObjectID{},
+	}
+
+	insertionResult, _ := collection.InsertOne(context.Background(), member)
+	logger2.
+		Infof("Instance\n%+v", insertionResult)
 	logger2.
 		Infof("Configuration settings\n%+v", config)
-
 	app := fiber.New()
 
 	app.Get("/swagger/*", swagger.HandlerDefault)

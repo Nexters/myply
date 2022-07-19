@@ -2,6 +2,8 @@ package configs
 
 import (
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/google/wire"
 	"github.com/joho/godotenv"
@@ -17,6 +19,7 @@ type Config struct {
 	Phase       Phase
 	MongoURI    string
 	MongoDBName string
+	MongoTTL    time.Duration
 }
 
 const (
@@ -53,7 +56,7 @@ func (p Phase) String() string {
 	return "local"
 }
 
-func NewConfig() *Config {
+func NewConfig() (*Config, error) {
 	phase := parsePhase(os.Getenv("PHASE"))
 
 	if phase == Test {
@@ -62,9 +65,14 @@ func NewConfig() *Config {
 		godotenv.Load(".env.local")
 	}
 
+	mongoTTL, err := strconv.Atoi(os.Getenv("MONGO_TTL"))
+	if err != nil {
+		return nil, err
+	}
 	return &Config{
 		Phase:       phase,
 		MongoURI:    os.Getenv("MONGO_URI"),
 		MongoDBName: os.Getenv("MONGO_DB_NAME"),
-	}
+		MongoTTL:    time.Duration(mongoTTL) * time.Second,
+	}, nil
 }

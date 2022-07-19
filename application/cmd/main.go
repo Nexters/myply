@@ -7,6 +7,9 @@ import (
 )
 
 func main() {
-	app, _ := application.New()
+	app, err := application.New()
+	if err != nil {
+		panic(err)
+	}
 	log.Fatal(app.Listen(":8080"))
 }

@@ -9,7 +9,7 @@ import (
 
 var Set = wire.NewSet(NewLogger)
 
-func NewLogger(config *configs.Config) *zap.SugaredLogger {
+func NewLogger(config *configs.Config) (*zap.SugaredLogger, error) {
 	var (
 		zapConfig zap.Config
 		logger    *zap.Logger
@@ -28,9 +28,9 @@ func NewLogger(config *configs.Config) *zap.SugaredLogger {
 	defer logger.Sync()
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return logger.Sugar()
+	return logger.Sugar(), nil
 }
 
 func getProdEncoderConfig() zapcore.EncoderConfig {

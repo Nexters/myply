@@ -6,21 +6,24 @@
 package application
 
 import (
+	"context"
 	"fmt"
-
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
+	"github.com/Nexters/myply/infrastructure/persistence"
+	"github.com/Nexters/myply/infrastructure/persistence/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
+	"github.com/google/uuid"
 	"github.com/google/wire"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 
 	_ "github.com/Nexters/myply/docs"
 )
 
 func New() (*fiber.App, error) {
-	wire.Build(wire.NewSet(NewServer, logger.Set, configs.Set))
-	return nil, nil
+	panic(wire.Build(wire.NewSet(NewServer, logger.Set, configs.Set, db.Set)))
 }
 
 // @title MYPLY SERVER
@@ -33,9 +36,20 @@ func New() (*fiber.App, error) {
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /
-func NewServer(config *configs.Config, logger *zap.SugaredLogger) *fiber.App {
-	logger.Infof("Configuration settings\n%+v", config)
+func NewServer(config *configs.Config, logger *zap.SugaredLogger, mongo *db.MongoInstance) *fiber.App {
+	// TODO: move to repository
+	collection := mongo.Db.Collection("members")
+	member := persistence.Member{
+		ID:      uuid.NewString(),
+		Name:    "leoo",
+		MemoIDs: []primitive.ObjectID{},
+	}
+	// TODO: move to api
+	insertionResult, _ := collection.InsertOne(context.Background(), member)
+	logger.Infof("Instance\n%+v", insertionResult)
+	
 
+	logger.Infof("Configuration settings\n%+v", config)
 	app := fiber.New()
 
 	// TODO: wire routes
