@@ -12,11 +12,11 @@ import (
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/router"
 	"github.com/Nexters/myply/domain/service"
+	"github.com/Nexters/myply/infrastructure/clients"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
 	"github.com/Nexters/myply/infrastructure/persistence"
 	"github.com/Nexters/myply/infrastructure/persistence/db"
-	"github.com/Nexters/myply/infrastructure/persistence/thirdparty"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 	"github.com/google/uuid"
@@ -43,30 +43,16 @@ func New() (*fiber.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	app := NewServer(config, sugaredLogger, mongoInstance)
-	return app, nil
-}
-
-func NewMusicsController() (controller.MusicsController, error) {
-	config, err := configs.NewConfig()
-	if err != nil {
-		return nil, err
-	}
-	youtube := thirdparty.NewYoutubeApiV3(config)
+	youtube := clients.NewYoutubeApiV3(config)
 	musicsRepository := persistence.NewMusicRepository(youtube)
 	musicsService := service.NewMusicsService(musicsRepository)
 	musicsController := controller.NewMusicsController(musicsService)
-	return musicsController, nil
+	routerRouter := router.NewMusicsRouter(musicsController)
+	app := NewServer(config, sugaredLogger, mongoInstance, routerRouter)
+	return app, nil
 }
 
 // server.go:
-
-func SetRoutes(root *fiber.Router) {
-	musicsController, err := NewMusicsController()
-	if err == nil {
-		router.SetMusicsRouter(root, musicsController)
-	}
-}
 
 // @title MYPLY SERVER
 // @version 1.0
@@ -78,7 +64,11 @@ func SetRoutes(root *fiber.Router) {
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /
-func NewServer(config *configs.Config, logger2 *zap.SugaredLogger, mongo *db.MongoInstance) *fiber.App {
+func NewServer(
+	config *configs.Config, logger2 *zap.SugaredLogger,
+	mongo *db.MongoInstance,
+	musicsRouter router.MusicsRouter,
+) *fiber.App {
 
 	collection := mongo.Db.Collection("members")
 	member := persistence.Member{
@@ -108,7 +98,7 @@ func NewServer(config *configs.Config, logger2 *zap.SugaredLogger, mongo *db.Mon
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
-	SetRoutes(&v1)
+	musicsRouter.Init(&v1)
 
 	return app
 }

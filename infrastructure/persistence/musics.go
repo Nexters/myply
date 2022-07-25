@@ -3,14 +3,14 @@ package persistence
 import (
 	"github.com/Nexters/myply/domain/entity"
 	"github.com/Nexters/myply/domain/repository"
-	"github.com/Nexters/myply/infrastructure/persistence/thirdparty"
+	"github.com/Nexters/myply/infrastructure/clients"
 )
 
 type MusicsRepository struct {
-	youtube thirdparty.Youtube
+	youtube clients.Youtube
 }
 
-func NewMusicRepository(ys thirdparty.Youtube) repository.MusicsRepository {
+func NewMusicRepository(ys clients.Youtube) repository.MusicsRepository {
 	return &MusicsRepository{youtube: ys}
 }
 

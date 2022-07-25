@@ -57,13 +57,7 @@ func (p Phase) String() string {
 	return "local"
 }
 
-var instance *Config
-
 func NewConfig() (*Config, error) {
-	if instance != nil {
-		return instance, nil
-	}
-
 	phase := parsePhase(os.Getenv("PHASE"))
 
 	if phase == Test {
@@ -76,13 +70,11 @@ func NewConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	instance = &Config{
+	return &Config{
 		Phase:         phase,
 		MongoURI:      os.Getenv("MONGO_URI"),
 		MongoDBName:   os.Getenv("MONGO_DB_NAME"),
 		MongoTTL:      time.Duration(mongoTTL) * time.Second,
 		YoutubeApiKey: os.Getenv("YOUTUBE_API_KEY"),
-	}
-
-	return instance, nil
+	}, nil
 }

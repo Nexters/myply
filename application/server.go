@@ -11,11 +11,11 @@ import (
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/router"
 	"github.com/Nexters/myply/domain/service"
+	"github.com/Nexters/myply/infrastructure/clients"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
 	"github.com/Nexters/myply/infrastructure/persistence"
 	"github.com/Nexters/myply/infrastructure/persistence/db"
-	"github.com/Nexters/myply/infrastructure/persistence/thirdparty"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 	"github.com/google/uuid"
@@ -27,18 +27,16 @@ import (
 )
 
 func New() (*fiber.App, error) {
-	panic(wire.Build(wire.NewSet(NewServer, logger.Set, configs.Set, db.Set)))
-}
-
-func NewMusicsController() (controller.MusicsController, error) {
-	panic(wire.Build(wire.NewSet(controller.NewMusicsController, service.NewMusicsService, persistence.NewMusicRepository, thirdparty.NewYoutubeApiV3, configs.Set)))
-}
-
-func SetRoutes(root *fiber.Router) {
-	musicsController, err := NewMusicsController()
-	if err == nil {
-		router.SetMusicsRouter(root, musicsController)
-	}
+	panic(wire.Build(wire.NewSet(
+		NewServer,
+		logger.Set,
+		configs.Set,
+		db.Set,
+		clients.Set,
+		router.Set,
+		controller.Set,
+		service.Set,
+		persistence.Set)))
 }
 
 // @title MYPLY SERVER
@@ -51,7 +49,12 @@ func SetRoutes(root *fiber.Router) {
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /
-func NewServer(config *configs.Config, logger *zap.SugaredLogger, mongo *db.MongoInstance) *fiber.App {
+func NewServer(
+	config *configs.Config,
+	logger *zap.SugaredLogger,
+	mongo *db.MongoInstance,
+	musicsRouter router.MusicsRouter,
+) *fiber.App {
 	// TODO: move to repository
 	collection := mongo.Db.Collection("members")
 	member := persistence.Member{
@@ -82,7 +85,7 @@ func NewServer(config *configs.Config, logger *zap.SugaredLogger, mongo *db.Mong
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
-	SetRoutes(&v1)
+	musicsRouter.Init(&v1)
 
 	return app
 }
