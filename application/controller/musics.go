@@ -1,30 +1,99 @@
 package controller
 
 import (
+	"github.com/Nexters/myply/domain/entity"
 	"github.com/Nexters/myply/domain/service"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
-type MusicsController interface {
-	GetPopularList() fiber.Handler // TODO: pagination
+type MusicController interface {
+	Search() fiber.Handler // TODO: pagination
 }
 
-type musicsController struct {
-	musicsService service.MusicsService
+type musicController struct {
+	logger       *zap.SugaredLogger
+	musicService service.MusicsService
 }
 
-func NewMusicsController(ms service.MusicsService) MusicsController {
-	return &musicsController{musicsService: ms}
+func NewMusicController(l *zap.SugaredLogger, ms service.MusicsService) MusicController {
+	return &musicController{logger: l, musicService: ms}
 }
 
-func (mc *musicsController) GetPopularList() fiber.Handler {
+const (
+	RecentOrder  = "recent"
+	PopularOrder = "count"
+)
+
+type SearchQueryParams struct {
+	Q         []string `query:"q"`
+	Order     string   `query:"order"`
+	NextToken string   `query:"token"`
+}
+
+type MusicResponse struct {
+	YoutubeVideoID string   `json:"youtubeVideoID"`
+	ThumbnailURL   string   `json:"thumbnailURL"`
+	Title          string   `json:"title"`
+	YoutubeTags    []string `json:"youtubeTags"`
+	VideoDeepLink  string   `json:"videoDeepLink"`
+	IsMemoed       bool     `json:"isMemoed"`
+}
+
+type ListMusicResponse struct {
+	BaseResponse
+	Data []MusicResponse `json:"data"`
+}
+
+// @Summary      Search music playlist
+// @Description  플레이리스트 검색
+// @Tags         musics
+// @Accept       json
+// @Produce      json
+// @Param payload query SearchQueryParams true "query params"
+// @Success      200  {object}   ListMusicResponse
+// @Failure      500
+// @Router       /musics/search [get]
+func (mc *musicController) Search() fiber.Handler {
+
 	return func(ctx *fiber.Ctx) error {
-		musics, err := mc.musicsService.GetPopularList()
-
+		var (
+			musics *entity.Musics
+			err    error
+		)
+		p := new(SearchQueryParams)
+		err = ctx.QueryParser(p)
 		if err != nil {
-			return nil
+			return err
 		}
 
-		return ctx.JSON(musics)
+		switch p.Order {
+		case RecentOrder:
+			mc.logger.Info("Recent order")
+		case PopularOrder:
+			musics, err = mc.musicService.GetPopularList(p.Q)
+		default:
+			mc.logger.Error("Unknown order")
+		}
+		if err != nil {
+			mc.logger.Error(err)
+			return ctx.Status(500).SendString(err.Error())
+		}
+
+		data := []MusicResponse{}
+		for _, m := range *musics {
+			data = append(data, MusicResponse{
+				YoutubeVideoID: m.YoutubeVideoID,
+				ThumbnailURL:   m.ThumbnailURL,
+				Title:          m.Title,
+				YoutubeTags:    m.YoutubeTags,
+				VideoDeepLink:  m.DeepLink(),
+				IsMemoed:       false, // TODO: memo service
+			})
+		}
+		return ctx.Status(200).JSON(BaseResponse{
+			Code: Ok,
+			Data: data,
+		})
 	}
 }

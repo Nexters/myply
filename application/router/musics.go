@@ -8,16 +8,16 @@ import (
 type MusicsRouter = Router
 
 type musicsRouter struct {
-	musicsController controller.MusicsController
+	musicsController controller.MusicController
 }
 
-func NewMusicsRouter(mc controller.MusicsController) MusicsRouter {
+func NewMusicsRouter(mc controller.MusicController) MusicsRouter {
 	return &musicsRouter{musicsController: mc}
 }
 
 func (mr *musicsRouter) Init(root *fiber.Router) {
 	musicsRouter := (*root).Group("/musics")
 	{
-		musicsRouter.Get("/popular", mr.musicsController.GetPopularList())
+		musicsRouter.Get("/search", mr.musicsController.Search())
 	}
 }

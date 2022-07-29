@@ -7,10 +7,10 @@
 package application
 
 import (
-	"context"
 	"fmt"
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/router"
+	"github.com/Nexters/myply/docs"
 	"github.com/Nexters/myply/domain/service"
 	"github.com/Nexters/myply/infrastructure/clients"
 	"github.com/Nexters/myply/infrastructure/configs"
@@ -18,14 +18,10 @@ import (
 	"github.com/Nexters/myply/infrastructure/persistence"
 	"github.com/Nexters/myply/infrastructure/persistence/db"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/swagger"
-	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
-)
-
-import (
-	_ "github.com/Nexters/myply/docs"
 )
 
 // Injectors from server.go:
@@ -43,54 +39,32 @@ func New() (*fiber.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	youtube := clients.NewYoutubeApiV3(config)
-	musicsRepository := persistence.NewMusicRepository(youtube)
-	musicsService := service.NewMusicsService(musicsRepository)
-	musicsController := controller.NewMusicsController(musicsService)
-	routerRouter := router.NewMusicsRouter(musicsController)
+	youtubeClient, err := clients.NewYoutubeClient(config)
+	if err != nil {
+		return nil, err
+	}
+	musicRepository := persistence.NewMusicRepository()
+	musicsService := service.NewMusicService(sugaredLogger, youtubeClient, musicRepository)
+	musicController := controller.NewMusicController(sugaredLogger, musicsService)
+	routerRouter := router.NewMusicsRouter(musicController)
 	app := NewServer(config, sugaredLogger, mongoInstance, routerRouter)
 	return app, nil
 }
 
 // server.go:
 
-// @title MYPLY SERVER
-// @version 1.0
-// @description This is a sample swagger for Fiber
-// @termsOfService http://swagger.io/terms/
-// @contact.name API Support
-// @contact.email minkj1992@gmail.com
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host localhost:8080
-// @BasePath /
 func NewServer(
 	config *configs.Config, logger2 *zap.SugaredLogger,
 	mongo *db.MongoInstance,
 	musicsRouter router.MusicsRouter,
 ) *fiber.App {
-
-	collection := mongo.Db.Collection("members")
-	member := persistence.Member{
-		ID:      uuid.NewString(),
-		Name:    "leoo",
-		MemoIDs: []primitive.ObjectID{},
-	}
-
-	insertionResult, _ := collection.InsertOne(context.Background(), member)
-	logger2.
-		Infof("Instance\n%+v", insertionResult)
-	logger2.
-		Infof("Configuration settings\n%+v", config)
 	app := fiber.New()
+	app.Use(cors.New())
+	app.Use(etag.New())
 
+	setSwagger(config.BaseURI)
 	app.Get("/swagger/*", swagger.HandlerDefault)
-	app.Get("/swagger/*", swagger.New(swagger.Config{
-		URL:         "http://example.com/doc.json",
-		DeepLinking: false,
 
-		DocExpansion: "none",
-	}))
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString(fmt.Sprintf("[%s] Hello, myply ✈️", config.Phase))
 	})
@@ -101,4 +75,17 @@ func NewServer(
 	musicsRouter.Init(&v1)
 
 	return app
+}
+
+func setSwagger(baseURI string) {
+	docs.SwaggerInfo.
+		Title = "Myply Server ✈️"
+	docs.SwaggerInfo.
+		Description = "This is a My Playlist server."
+	docs.SwaggerInfo.
+		Version = "1.0"
+	docs.SwaggerInfo.
+		Host = baseURI
+	docs.SwaggerInfo.
+		BasePath = "/api/v1"
 }

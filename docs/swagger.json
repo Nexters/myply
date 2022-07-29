@@ -1,20 +1,99 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample swagger for Fiber",
-        "title": "MYPLY SERVER",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "email": "minkj1992@gmail.com"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
-        "version": "1.0"
+        "contact": {}
     },
-    "host": "localhost:8080",
-    "basePath": "/",
-    "paths": {}
+    "paths": {
+        "/musics/search": {
+            "get": {
+                "description": "플레이리스트 검색",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "musics"
+                ],
+                "summary": "Search music playlist",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "nextToken",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ListMusicResponse"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controller.ListMusicResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.MusicResponse"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.MusicResponse": {
+            "type": "object",
+            "properties": {
+                "isMemoed": {
+                    "type": "boolean"
+                },
+                "thumbnailURL": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "videoDeepLink": {
+                    "type": "string"
+                },
+                "youtubeTags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "youtubeVideoID": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }

@@ -1,15 +1,62 @@
-basePath: /
-host: localhost:8080
+definitions:
+  controller.ListMusicResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/controller.MusicResponse'
+        type: array
+      message:
+        type: string
+    type: object
+  controller.MusicResponse:
+    properties:
+      isMemoed:
+        type: boolean
+      thumbnailURL:
+        type: string
+      title:
+        type: string
+      videoDeepLink:
+        type: string
+      youtubeTags:
+        items:
+          type: string
+        type: array
+      youtubeVideoID:
+        type: string
+    type: object
 info:
-  contact:
-    email: minkj1992@gmail.com
-    name: API Support
-  description: This is a sample swagger for Fiber
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
-  title: MYPLY SERVER
-  version: "1.0"
-paths: {}
+  contact: {}
+paths:
+  /musics/search:
+    get:
+      consumes:
+      - application/json
+      description: 플레이리스트 검색
+      parameters:
+      - in: query
+        name: nextToken
+        type: string
+      - in: query
+        name: order
+        type: string
+      - in: query
+        items:
+          type: string
+        name: q
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.ListMusicResponse'
+        "500":
+          description: ""
+      summary: Search music playlist
+      tags:
+      - musics
 swagger: "2.0"
