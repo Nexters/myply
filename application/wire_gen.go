@@ -39,7 +39,11 @@ func New() (*fiber.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	app := NewServer(config, sugaredLogger, mongoInstance)
+	redisInstance, err := db.NewRedisDB(config)
+	if err != nil {
+		return nil, err
+	}
+	app := NewServer(config, sugaredLogger, mongoInstance, redisInstance)
 	return app, nil
 }
 
@@ -55,7 +59,7 @@ func New() (*fiber.App, error) {
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /
-func NewServer(config *configs.Config, logger2 *zap.SugaredLogger, mongo *db.MongoInstance) *fiber.App {
+func NewServer(config *configs.Config, logger2 *zap.SugaredLogger, mongo *db.MongoInstance, rdb *db.RedisInstance) *fiber.App {
 
 	collection := mongo.Db.Collection("members")
 	member := persistence.Member{
