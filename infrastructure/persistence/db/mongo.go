@@ -11,7 +11,7 @@ import (
 	"github.com/google/wire"
 )
 
-var Set = wire.NewSet(NewMongoDB)
+var Set = wire.NewSet(NewMongoDB, NewRedisDB)
 
 // MongoInstance contains the Mongo client and database objects
 type MongoInstance struct {

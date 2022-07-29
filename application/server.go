@@ -36,7 +36,7 @@ func New() (*fiber.App, error) {
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /
-func NewServer(config *configs.Config, logger *zap.SugaredLogger, mongo *db.MongoInstance) *fiber.App {
+func NewServer(config *configs.Config, logger *zap.SugaredLogger, mongo *db.MongoInstance, rdb *db.RedisInstance) *fiber.App {
 	// TODO: move to repository
 	collection := mongo.Db.Collection("members")
 	member := persistence.Member{
@@ -47,7 +47,6 @@ func NewServer(config *configs.Config, logger *zap.SugaredLogger, mongo *db.Mong
 	// TODO: move to api
 	insertionResult, _ := collection.InsertOne(context.Background(), member)
 	logger.Infof("Instance\n%+v", insertionResult)
-	
 
 	logger.Infof("Configuration settings\n%+v", config)
 	app := fiber.New()
