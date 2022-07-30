@@ -16,10 +16,12 @@ type Phase int64
 
 // Config is myply' configuration instance, singleton
 type Config struct {
-	Phase       Phase
-	MongoURI    string
-	MongoDBName string
-	MongoTTL    time.Duration
+	Phase         Phase
+	BaseURI       string
+	MongoURI      string
+	MongoDBName   string
+	MongoTTL      time.Duration
+	YoutubeAPIKey string
 }
 
 const (
@@ -70,9 +72,11 @@ func NewConfig() (*Config, error) {
 		return nil, err
 	}
 	return &Config{
-		Phase:       phase,
-		MongoURI:    os.Getenv("MONGO_URI"),
-		MongoDBName: os.Getenv("MONGO_DB_NAME"),
-		MongoTTL:    time.Duration(mongoTTL) * time.Second,
+		Phase:         phase,
+		BaseURI:       os.Getenv("BASE_URI"),
+		MongoURI:      os.Getenv("MONGO_URI"),
+		MongoDBName:   os.Getenv("MONGO_DB_NAME"),
+		MongoTTL:      time.Duration(mongoTTL) * time.Second,
+		YoutubeAPIKey: os.Getenv("YOUTUBE_API_KEY"),
 	}, nil
 }
