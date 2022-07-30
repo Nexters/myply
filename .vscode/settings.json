@@ -1,0 +1,18 @@
+{
+  "go.autocompleteUnimportedPackages": true,
+  "[go]": {
+    "editor.insertSpaces": false,
+    "editor.defaultFormatter": "golang.go",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    },
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+  },
+  "gopls": {
+    "ui.semanticTokens": true,
+    "build.buildFlags": [
+      "-tags=wireinject"
+    ]
+  },
+}
