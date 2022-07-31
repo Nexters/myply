@@ -1,7 +1,8 @@
 # `myply` Server
 > This is a repository for `myply` server
 
-<img width="1728" alt="myply" src="https://user-images.githubusercontent.com/37536298/177248803-64893e61-827b-4a54-81f0-fd8ee664fe9f.png">
+<img width="1163" alt="Screen Shot 2022-07-31 at 7 59 11 PM" src="https://user-images.githubusercontent.com/37536298/182022976-061e3bbb-0b5d-4c00-8e18-ce683c22ff0e.png">
+
 
 - spec
   - `Go` 1.18 or later, to use generics
