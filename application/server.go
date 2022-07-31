@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/Nexters/myply/application/controller"
+	_ "github.com/Nexters/myply/docs"
 	"github.com/Nexters/myply/domain"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
@@ -18,12 +19,8 @@ import (
 	"github.com/gofiber/swagger"
 	"github.com/google/uuid"
 	"github.com/google/wire"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
-	"time"
-
-	_ "github.com/Nexters/myply/docs"
 )
 
 func New() (*fiber.App, error) {
@@ -57,33 +54,6 @@ func NewServer(
 	// TODO: move to api
 	insertionResult, _ := collection.InsertOne(context.Background(), member)
 	logger.Infof("Instance\n%+v", insertionResult)
-
-	// TODO: erase following code (just for test)
-	collection = mongo.Db.Collection("memos")
-	memoId := primitive.NewObjectID()
-	fmt.Printf("objectId: %s", memoId)
-	fmt.Printf("objectId in string: %s", memoId.String())
-
-	memo := persistence.MemoData{
-		ID:             primitive.NewObjectID(),
-		DeviceToken:    "",
-		YoutubeVideoId: "",
-		Body:           "",
-		TagIds:         nil,
-		CreatedAt: primitive.Timestamp{
-			T: uint32(time.Now().Unix()),
-			I: 0,
-		},
-		UpdatedAt: primitive.Timestamp{
-			T: uint32(time.Now().Unix()),
-			I: 0,
-		},
-	}
-	insertionResult, _ = collection.InsertOne(context.Background(), memo)
-	logger.Infof("Instance\n%+v", insertionResult)
-
-	findResult := collection.FindOne(context.Background(), bson.M{"_id": memoId})
-	logger.Infof("Instance\n%+v", findResult)
 
 	logger.Infof("Configuration settings\n%+v", config)
 	app := fiber.New()
