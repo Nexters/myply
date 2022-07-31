@@ -8,9 +8,8 @@ import (
 
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/router"
-	"github.com/Nexters/myply/domain/service"
+	"github.com/Nexters/myply/domain"
 	"github.com/Nexters/myply/infrastructure/clients"
-
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
 	"github.com/Nexters/myply/infrastructure/persistence"
@@ -18,6 +17,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 	"github.com/google/wire"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 
 	"github.com/Nexters/myply/docs"
@@ -44,6 +45,7 @@ func NewServer(
 	logger *zap.SugaredLogger,
 	mongo *db.MongoInstance,
 	musicsRouter router.MusicsRouter,
+	mc *controller.MemoController,
 ) *fiber.App {
 	app := fiber.New(fiber.Config{
 		// Override default error handler
@@ -64,7 +66,11 @@ func NewServer(
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
+	app.Get("/v1/memos/:id", (*mc).GetMemo)
+	app.Post("/v1/memos", (*mc).AddMemo)
+
 	musicsRouter.Init(&v1)
+
 
 	return app
 }
