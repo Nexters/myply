@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/gofiber/fiber/v2 v2.34.1
 	github.com/gofiber/swagger v0.0.1
+	github.com/google/uuid v1.3.0
 	github.com/google/wire v0.5.0
 	github.com/swaggo/swag v1.8.3
 	go.mongodb.org/mongo-driver v1.10.0
@@ -13,7 +14,6 @@ require (
 
 require (
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
