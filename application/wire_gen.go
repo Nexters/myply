@@ -9,6 +9,8 @@ package application
 import (
 	"context"
 	"fmt"
+	"github.com/Nexters/myply/application/controller"
+	"github.com/Nexters/myply/domain/memos"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
 	"github.com/Nexters/myply/infrastructure/persistence"
@@ -16,8 +18,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
+	"time"
 )
 
 import (
@@ -39,7 +43,10 @@ func New() (*fiber.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	app := NewServer(config, sugaredLogger, mongoInstance)
+	repository := persistence.NewMemoRepository(mongoInstance)
+	service := memos.NewMemoService(repository)
+	memoController := controller.NewMemoController(service)
+	app := NewServer(config, sugaredLogger, mongoInstance, memoController)
 	return app, nil
 }
 
@@ -55,7 +62,11 @@ func New() (*fiber.App, error) {
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /
-func NewServer(config *configs.Config, logger2 *zap.SugaredLogger, mongo *db.MongoInstance) *fiber.App {
+func NewServer(
+	config *configs.Config, logger2 *zap.SugaredLogger,
+	mongo *db.MongoInstance,
+	mc *controller.MemoController,
+) *fiber.App {
 
 	collection := mongo.Db.Collection("members")
 	member := persistence.Member{
@@ -67,6 +78,33 @@ func NewServer(config *configs.Config, logger2 *zap.SugaredLogger, mongo *db.Mon
 	insertionResult, _ := collection.InsertOne(context.Background(), member)
 	logger2.
 		Infof("Instance\n%+v", insertionResult)
+
+	collection = mongo.Db.Collection("memos")
+	memoId := primitive.NewObjectID()
+	fmt.Printf("objectId: %s", memoId)
+	fmt.Printf("objectId in string: %s", memoId.String())
+	memo2 := persistence.MemoData{
+		ID:             primitive.NewObjectID(),
+		DeviceToken:    "",
+		YoutubeVideoId: "",
+		Body:           "",
+		TagIds:         nil,
+		CreatedAt: primitive.Timestamp{
+			T: uint32(time.Now().Unix()),
+			I: 0,
+		},
+		UpdatedAt: primitive.Timestamp{
+			T: uint32(time.Now().Unix()),
+			I: 0,
+		},
+	}
+	insertionResult, _ = collection.InsertOne(context.Background(), memo2)
+	logger2.
+		Infof("Instance\n%+v", insertionResult)
+
+	findResult := collection.FindOne(context.Background(), bson.M{"_id": memoId})
+	logger2.
+		Infof("Instance\n%+v", findResult)
 	logger2.
 		Infof("Configuration settings\n%+v", config)
 	app := fiber.New()
@@ -81,6 +119,8 @@ func NewServer(config *configs.Config, logger2 *zap.SugaredLogger, mongo *db.Mon
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString(fmt.Sprintf("[%s] Hello, myply ✈️", config.Phase))
 	})
+	app.Get("/v1/memos/:id", (*mc).GetMemo)
+	app.Post("/v1/memos", (*mc).AddMemo)
 
 	return app
 }
