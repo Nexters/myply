@@ -39,7 +39,7 @@ func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 	}
 
 	// TODO: respond real data
-	memoResp := MemoResponse{memoId: m.Id, thumbnailURL: "", title: "", body: m.Body, keywords: []string{}}
+	memoResp := MemoResponse{MemoId: m.Id, ThumbnailURL: "", Title: "", Body: m.Body, Keywords: []string{}}
 	resp = Response{
 		code:    fiber.StatusOK,
 		message: "",
@@ -80,7 +80,7 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 		}
 	}
 
-	memoResp := MemoResponse{memoId: id, thumbnailURL: "", title: "", body: "", keywords: []string{}}
+	memoResp := MemoResponse{MemoId: id, ThumbnailURL: "", Title: "", Body: "", Keywords: []string{}}
 	resp = Response{
 		code:    fiber.StatusCreated,
 		message: "",
@@ -97,19 +97,19 @@ type addRequest struct {
 }
 
 type MemoResponse struct {
-	memoId       string
-	thumbnailURL string
-	title        string
-	body         string
-	keywords     []string
+	MemoId       string   `json:"memoID"`
+	ThumbnailURL string   `json:"thumbnailURL"`
+	Title        string   `json:"title"`
+	Body         string   `json:"body"`
+	Keywords     []string `json:"keywords"`
 }
 
 func (r *MemoResponse) toMap() fiber.Map {
 	return fiber.Map{
-		"memoId":       r.memoId,
-		"thumbnailURL": r.thumbnailURL,
-		"title":        r.title,
-		"body":         r.body,
-		"keywords":     r.keywords,
+		"memoId":       r.MemoId,
+		"thumbnailURL": r.ThumbnailURL,
+		"title":        r.Title,
+		"body":         r.Body,
+		"keywords":     r.Keywords,
 	}
 }
