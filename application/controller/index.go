@@ -2,7 +2,7 @@ package controller
 
 import "github.com/google/wire"
 
-var Set = wire.NewSet(NewMusicController)
+var Set = wire.NewSet(NewMusicController, NewMemoController)
 
 type HTTPCode int32
 
