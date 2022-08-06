@@ -5,10 +5,11 @@ package application
 
 import (
 	"fmt"
+	"github.com/Nexters/myply/domain/memos"
+	"github.com/Nexters/myply/domain/service"
 
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/router"
-	"github.com/Nexters/myply/domain"
 	"github.com/Nexters/myply/infrastructure/clients"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
@@ -17,7 +18,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 	"github.com/google/wire"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 
 	"github.com/Nexters/myply/docs"
@@ -36,6 +36,7 @@ func New() (*fiber.App, error) {
 		router.Set,
 		controller.Set,
 		service.Set,
+		memos.Set,
 		persistence.Set)))
 }
 
@@ -69,7 +70,6 @@ func NewServer(
 	app.Post("/v1/memos", (*mc).AddMemo)
 
 	musicsRouter.Init(&v1)
-
 
 	return app
 }
