@@ -30,10 +30,10 @@ func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 	if err != nil {
 		switch {
 		case errors.Is(err, memos.NotFoundException):
-			resp = Response{code: fiber.StatusNotFound, message: err.Error(), data: MemoResponse{}}
+			resp = Response{code: fiber.StatusNotFound, message: err.Error(), data: fiber.Map{}}
 			return ctx.Status(fiber.StatusNotFound).JSON(resp.toMap())
 		default:
-			resp = Response{code: fiber.StatusInternalServerError, message: err.Error(), data: MemoResponse{}}
+			resp = Response{code: fiber.StatusInternalServerError, message: err.Error(), data: fiber.Map{}}
 			return ctx.Status(fiber.StatusInternalServerError).JSON(resp.toMap())
 		}
 	}
@@ -43,7 +43,7 @@ func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 	resp = Response{
 		code:    fiber.StatusOK,
 		message: "",
-		data:    memoResp,
+		data:    memoResp.toMap(),
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(resp.toMap())
@@ -62,14 +62,14 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 		resp = Response{
 			code:    fiber.StatusBadRequest,
 			message: "failed due to empty device-token",
-			data:    MemoResponse{},
+			data:    fiber.Map{},
 		}
 		return ctx.Status(fiber.StatusBadRequest).JSON(resp.toMap())
 	}
 
 	id, err := (*c.service).AddMemo(req.YoutubeVideoId, req.Body, token)
 	if err != nil {
-		resp = Response{message: err.Error(), data: MemoResponse{}}
+		resp = Response{message: err.Error(), data: fiber.Map{}}
 		switch {
 		case errors.Is(err, memos.AlreadyExistsException):
 			resp.code = fiber.StatusBadRequest
@@ -84,7 +84,7 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 	resp = Response{
 		code:    fiber.StatusCreated,
 		message: "",
-		data:    memoResp,
+		data:    memoResp.toMap(),
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(resp.toMap())
@@ -96,20 +96,6 @@ type addRequest struct {
 	Body           string `json:"body"`
 }
 
-type Response struct {
-	code    int32
-	message string
-	data    MemoResponse
-}
-
-func (r *Response) toMap() *fiber.Map {
-	return &fiber.Map{
-		"code":    r.code,
-		"message": r.message,
-		"data":    r.data.toMap(),
-	}
-}
-
 type MemoResponse struct {
 	memoId       string
 	thumbnailURL string
@@ -118,8 +104,8 @@ type MemoResponse struct {
 	keywords     []string
 }
 
-func (r *MemoResponse) toMap() *fiber.Map {
-	return &fiber.Map{
+func (r *MemoResponse) toMap() fiber.Map {
+	return fiber.Map{
 		"memoId":       r.memoId,
 		"thumbnailURL": r.thumbnailURL,
 		"title":        r.title,
