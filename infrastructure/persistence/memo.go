@@ -23,6 +23,23 @@ type MemoData struct {
 	UpdatedAt      primitive.Timestamp  `json:"updatedAt"`
 }
 
+func (m *MemoData) toEntity() *memos.Memo {
+	var tagIds []string
+	for _, id := range m.TagIds {
+		tagIds = append(tagIds, id.Hex())
+	}
+
+	return &memos.Memo{
+		Id:             m.ID.Hex(),
+		DeviceToken:    m.DeviceToken,
+		YoutubeVideoId: m.YoutubeVideoId,
+		Body:           m.Body,
+		TagIds:         tagIds,
+		CreatedAt:      time.Unix(int64(m.CreatedAt.T), 0),
+		UpdatedAt:      time.Unix(int64(m.UpdatedAt.T), 0),
+	}
+}
+
 type MemoMongoRepository struct {
 	conn *mongo.Database
 }
@@ -51,7 +68,7 @@ func (r *MemoMongoRepository) GetMemo(id string) (*memos.Memo, error) {
 		}
 	}
 
-	return r.toEntity(&md), nil
+	return md.toEntity(), nil
 }
 
 func (r *MemoMongoRepository) GetMemoByVideoId(id string) (*memos.Memo, error) {
@@ -67,7 +84,7 @@ func (r *MemoMongoRepository) GetMemoByVideoId(id string) (*memos.Memo, error) {
 		}
 	}
 
-	return r.toEntity(&md), nil
+	return md.toEntity(), nil
 }
 
 func (r *MemoMongoRepository) SaveMemo(videoId string, body string, deviceToken string) (string, error) {
@@ -101,22 +118,5 @@ func (r *MemoMongoRepository) now() *primitive.Timestamp {
 	return &primitive.Timestamp{
 		T: uint32(time.Now().Unix()),
 		I: 0,
-	}
-}
-
-func (r *MemoMongoRepository) toEntity(m *MemoData) *memos.Memo {
-	var tagIds []string
-	for _, id := range m.TagIds {
-		tagIds = append(tagIds, id.Hex())
-	}
-
-	return &memos.Memo{
-		Id:             m.ID.Hex(),
-		DeviceToken:    m.DeviceToken,
-		YoutubeVideoId: m.YoutubeVideoId,
-		Body:           m.Body,
-		TagIds:         tagIds,
-		CreatedAt:      time.Unix(int64(m.CreatedAt.T), 0),
-		UpdatedAt:      time.Unix(int64(m.UpdatedAt.T), 0),
 	}
 }
