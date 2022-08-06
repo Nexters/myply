@@ -4,11 +4,6 @@ import (
 	"errors"
 )
 
-var (
-	NotFoundException      error
-	AlreadyExistsException error
-)
-
 type Service interface {
 	GetMemo(id string) (*Memo, error)
 	AddMemo(videoId string, body string, deviceToken string) (memoId string, e error)
