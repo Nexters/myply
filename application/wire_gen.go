@@ -14,29 +14,25 @@ import (
 	"github.com/Nexters/myply/docs"
 	"github.com/Nexters/myply/domain/member"
 	"github.com/Nexters/myply/domain/memos"
-	"github.com/Nexters/myply/domain/service"
+	"github.com/Nexters/myply/domain/musics"
 	"github.com/Nexters/myply/domain/tag"
 	"github.com/Nexters/myply/infrastructure/clients"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
 	"github.com/Nexters/myply/infrastructure/persistence"
+	"github.com/Nexters/myply/infrastructure/persistence/cache"
 	"github.com/Nexters/myply/infrastructure/persistence/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	recover2 "github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/swagger"
-	"go.uber.org/zap"
 )
 
 // Injectors from server.go:
 
 func New() (*fiber.App, error) {
 	config, err := configs.NewConfig()
-	if err != nil {
-		return nil, err
-	}
-	sugaredLogger, err := logger.NewLogger(config)
 	if err != nil {
 		return nil, err
 	}
@@ -49,23 +45,30 @@ func New() (*fiber.App, error) {
 	memberController := controller.NewMemberController(memberService)
 	memberRouter := router.NewMemberRouter(memberController)
 	repository := persistence.NewMemoRepository(mongoInstance)
-	memosService := memos.NewMemoService(repository)
-	memoController := controller.NewMemoController(memosService)
+	service := memos.NewMemoService(repository)
+	memoController := controller.NewMemoController(service)
 	memoRouter := router.NewMemoRouter(memoController)
+	sugaredLogger, err := logger.NewLogger(config)
+	if err != nil {
+		return nil, err
+	}
+	cacheCache, err := cache.NewMongoCacheDB(mongoInstance, config)
+	if err != nil {
+		return nil, err
+	}
 	youtubeClient, err := clients.NewYoutubeClient(config)
 	if err != nil {
 		return nil, err
 	}
-	musicRepository := persistence.NewMusicRepository()
-	musicsService := service.NewMusicService(sugaredLogger, youtubeClient, musicRepository)
+	musicRepository := persistence.NewMusicRepository(config, cacheCache, youtubeClient)
+	musicsService := musics.NewMusicService(sugaredLogger, musicRepository, config, cacheCache)
 	musicController := controller.NewMusicController(sugaredLogger, musicsService)
 	musicsRouter := router.NewMusicsRouter(musicController)
 	tagRepository := persistence.NewTagRepository()
 	tagService := tag.NewTagService(tagRepository)
 	tagController := controller.NewTagController(tagService)
 	tagRouter := router.NewTagRouter(tagController)
-	app := NewServer(config, sugaredLogger, mongoInstance, memberRouter, memoRouter, musicsRouter, tagRouter)
-
+	app := NewServer(config, memberRouter, memoRouter, musicsRouter, tagRouter)
 	return app, nil
 }
 
@@ -82,15 +85,13 @@ func New() (*fiber.App, error) {
 // @host localhost:8080
 // @BasePath /
 func NewServer(
-	config *configs.Config, logger2 *zap.SugaredLogger,
-	mongo *db.MongoInstance,
+	config *configs.Config,
 	memberRouter router.MemberRouter,
 	memoRouter router.MemoRouter,
 	musicsRouter router.MusicsRouter,
 	tagRouter router.TagRouter,
 ) *fiber.App {
 	app := fiber.New(fiber.Config{
-
 		ErrorHandler: CustomErrorHandler,
 	})
 

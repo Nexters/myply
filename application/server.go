@@ -8,7 +8,7 @@ import (
 
 	"github.com/Nexters/myply/domain/member"
 	"github.com/Nexters/myply/domain/memos"
-	"github.com/Nexters/myply/domain/service"
+	"github.com/Nexters/myply/domain/musics"
 	"github.com/Nexters/myply/domain/tag"
 
 	"github.com/Nexters/myply/application/controller"
@@ -18,11 +18,9 @@ import (
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
 	"github.com/Nexters/myply/infrastructure/persistence"
-	"github.com/Nexters/myply/infrastructure/persistence/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 	"github.com/google/wire"
-	"go.uber.org/zap"
 
 	"github.com/Nexters/myply/docs"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -35,14 +33,13 @@ func New() (*fiber.App, error) {
 		NewServer,
 		logger.Set,
 		configs.Set,
-		db.Set,
 		clients.Set,
 		router.Set,
 		controller.Set,
-		service.Set,
 		memos.Set,
 		persistence.Set,
 		member.Set,
+		musics.Set,
 		tag.Set)))
 }
 
@@ -58,15 +55,12 @@ func New() (*fiber.App, error) {
 // @BasePath /
 func NewServer(
 	config *configs.Config,
-	logger *zap.SugaredLogger,
-	mongo *db.MongoInstance,
 	memberRouter router.MemberRouter,
 	memoRouter router.MemoRouter,
 	musicsRouter router.MusicsRouter,
 	tagRouter router.TagRouter,
 ) *fiber.App {
 	app := fiber.New(fiber.Config{
-		// Override default error handler
 		ErrorHandler: CustomErrorHandler,
 	})
 

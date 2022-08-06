@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/reactivex/rxgo/v2"
+	rxgo "github.com/reactivex/rxgo/v2"
 )
 
 type Tag struct {

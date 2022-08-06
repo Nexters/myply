@@ -3,7 +3,6 @@ package clients
 import (
 	"context"
 
-	"github.com/Nexters/myply/domain/entity"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"google.golang.org/api/option"
 	v3 "google.golang.org/api/youtube/v3"
@@ -14,19 +13,23 @@ var (
 )
 
 const (
+	YoutubeVideoType   = "youtube#video"
+	YoutubeChannelType = "youtube#channel"
+)
+
+const (
 	videoCategory = "10" // music
 	regionCode    = "kr"
 	videoDuration = "long" // more than 20m
 	maxResults    = 25
-
-	youtubeVideoType   = "youtube#video"
-	youtubeChannelType = "youtube#channel"
 )
 
-type tagMap map[string][]string
+type TagMap map[string][]string
 
 type YoutubeClient interface {
-	SearchPlaylist(q string) (*entity.Musics, error)
+	SearchPlaylist(q string) (*v3.SearchListResponse, error)
+	ParseVideoIds(items []*v3.SearchResult) []string
+	ParseVideoTags(ids []string) (TagMap, error)
 }
 
 type youtubeClient struct {
@@ -46,7 +49,7 @@ func NewYoutubeClient(config *configs.Config) (YoutubeClient, error) {
 	return &youtubeClient{service}, nil
 }
 
-func (yc *youtubeClient) SearchPlaylist(q string) (*entity.Musics, error) {
+func (yc *youtubeClient) SearchPlaylist(q string) (*v3.SearchListResponse, error) {
 	call := yc.service.Search.List([]string{"id, snippet"}).
 		Q(q).
 		Type(targetTypes...).
@@ -60,11 +63,19 @@ func (yc *youtubeClient) SearchPlaylist(q string) (*entity.Musics, error) {
 	if err != nil {
 		return nil, err
 	}
-	return yc.buildMusicListResponse(response.Items)
+	return response, nil
 }
 
-func (yc *youtubeClient) getVideoTags(ids []string) (tagMap, error) {
-	tags := make(tagMap)
+func (yc *youtubeClient) ParseVideoIds(items []*v3.SearchResult) []string {
+	ids := make([]string, len(items))
+	for _, item := range items {
+		ids = append(ids, item.Id.VideoId)
+	}
+	return ids
+}
+
+func (yc *youtubeClient) ParseVideoTags(ids []string) (TagMap, error) {
+	tags := make(TagMap)
 
 	call := yc.service.Videos.List([]string{"snippet"}).Id(ids...)
 	response, err := call.Do()
@@ -76,34 +87,4 @@ func (yc *youtubeClient) getVideoTags(ids []string) (tagMap, error) {
 		tags[i.Id] = i.Snippet.Tags
 	}
 	return tags, nil
-}
-
-func getVideoIds(items []*v3.SearchResult) []string {
-	ids := make([]string, len(items))
-	for _, item := range items {
-		ids = append(ids, item.Id.VideoId)
-	}
-	return ids
-}
-
-func (yc *youtubeClient) buildMusicListResponse(items []*v3.SearchResult) (*entity.Musics, error) {
-	ids := getVideoIds(items)
-	musics := make(entity.Musics, len(items))
-	tags, err := yc.getVideoTags(ids)
-	if err != nil {
-		return nil, err
-	}
-
-	for i, item := range items {
-		switch item.Id.Kind {
-		case youtubeVideoType:
-			musics[i] = *entity.NewMusic(
-				item.Id.VideoId,
-				item.Snippet.Thumbnails.Default.Url,
-				item.Snippet.Title,
-				tags[item.Id.VideoId],
-			)
-		}
-	}
-	return &musics, nil
 }

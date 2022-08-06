@@ -8,10 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/Nexters/myply/infrastructure/configs"
-	"github.com/google/wire"
 )
-
-var Set = wire.NewSet(NewMongoDB)
 
 // MongoInstance contains the Mongo client and database objects
 type MongoInstance struct {
