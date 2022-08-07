@@ -6,6 +6,7 @@ var Set = wire.NewSet(
 	NewMemberController,
 	NewMemoController,
 	NewMusicController,
+	NewTagController,
 )
 
 type HTTPCode int32

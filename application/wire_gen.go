@@ -15,6 +15,7 @@ import (
 	"github.com/Nexters/myply/domain/member"
 	"github.com/Nexters/myply/domain/memos"
 	"github.com/Nexters/myply/domain/service"
+	"github.com/Nexters/myply/domain/tag"
 	"github.com/Nexters/myply/infrastructure/clients"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
@@ -59,7 +60,11 @@ func New() (*fiber.App, error) {
 	musicsService := service.NewMusicService(sugaredLogger, youtubeClient, musicRepository)
 	musicController := controller.NewMusicController(sugaredLogger, musicsService)
 	musicsRouter := router.NewMusicsRouter(musicController)
-	app := NewServer(config, sugaredLogger, mongoInstance, memberRouter, memoRouter, musicsRouter)
+	tagRepository := persistence.NewTagRepository()
+	tagService := tag.NewTagService(tagRepository)
+	tagController := controller.NewTagController(tagService)
+	tagRouter := router.NewTagRouter(tagController)
+	app := NewServer(config, sugaredLogger, mongoInstance, memberRouter, memoRouter, musicsRouter, tagRouter)
 	return app, nil
 }
 
@@ -81,6 +86,7 @@ func NewServer(
 	memberRouter router.MemberRouter,
 	memoRouter router.MemoRouter,
 	musicsRouter router.MusicsRouter,
+	tagRouter router.TagRouter,
 ) *fiber.App {
 	app := fiber.New(fiber.Config{
 
@@ -104,6 +110,7 @@ func NewServer(
 	memberRouter.Init(&v1)
 	memoRouter.Init(&v1)
 	musicsRouter.Init(&v1)
+	tagRouter.Init(&v1)
 
 	return app
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/Nexters/myply/domain/member"
 	"github.com/Nexters/myply/domain/memos"
 	"github.com/Nexters/myply/domain/service"
+	"github.com/Nexters/myply/domain/tag"
 
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/router"
@@ -41,7 +42,8 @@ func New() (*fiber.App, error) {
 		service.Set,
 		memos.Set,
 		persistence.Set,
-		member.Set)))
+		member.Set,
+		tag.Set)))
 }
 
 // @title MYPLY SERVER
@@ -61,6 +63,7 @@ func NewServer(
 	memberRouter router.MemberRouter,
 	memoRouter router.MemoRouter,
 	musicsRouter router.MusicsRouter,
+	tagRouter router.TagRouter,
 ) *fiber.App {
 	app := fiber.New(fiber.Config{
 		// Override default error handler
@@ -84,6 +87,7 @@ func NewServer(
 	memberRouter.Init(&v1)
 	memoRouter.Init(&v1)
 	musicsRouter.Init(&v1)
+	tagRouter.Init(&v1)
 
 	return app
 }
