@@ -8,7 +8,6 @@ package application
 
 import (
 	"fmt"
-
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/router"
 	"github.com/Nexters/myply/docs"

@@ -42,7 +42,6 @@ func (ms *musicService) GetPopularList(rawQueries []string) (*Musics, error) {
 		}
 		return musics, nil
 	}
-
 	ms.logger.Infof("\n[Cache hit]\n- key: %s\n- len of musics: %d\n", queries, len(*musics))
 	return musics, nil
 }
