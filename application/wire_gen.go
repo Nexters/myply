@@ -65,6 +65,7 @@ func New() (*fiber.App, error) {
 	tagController := controller.NewTagController(tagService)
 	tagRouter := router.NewTagRouter(tagController)
 	app := NewServer(config, sugaredLogger, mongoInstance, memberRouter, memoRouter, musicsRouter, tagRouter)
+
 	return app, nil
 }
 
