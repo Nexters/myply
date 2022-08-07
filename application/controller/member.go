@@ -8,7 +8,7 @@ import (
 )
 
 type MemberController interface {
-	SignUp() fiber.Handler // TODO: pagination
+	SignUp() fiber.Handler
 }
 
 type signUpDTO struct {

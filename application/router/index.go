@@ -8,4 +8,5 @@ var Set = wire.NewSet(
 	NewMemberRouter,
 	NewMemoRouter,
 	NewMusicsRouter,
+	NewTagRouter,
 )
