@@ -5,7 +5,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type MusicsRouter = Router
+type MusicsRouter interface {
+	Init(root *fiber.Router)
+}
 
 type musicsRouter struct {
 	musicsController controller.MusicController

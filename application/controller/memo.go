@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+
 	"github.com/Nexters/myply/domain/memos"
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,10 +16,8 @@ type memoController struct {
 	service *memos.Service
 }
 
-func NewMemoController(s *memos.Service) *MemoController {
-	var c MemoController
-	c = &memoController{service: s}
-	return &c
+func NewMemoController(s *memos.Service) MemoController {
+	return &memoController{service: s}
 }
 
 func (c *memoController) GetMemo(ctx *fiber.Ctx) error {

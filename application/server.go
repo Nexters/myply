@@ -5,11 +5,14 @@ package application
 
 import (
 	"fmt"
+
+	"github.com/Nexters/myply/domain/member"
 	"github.com/Nexters/myply/domain/memos"
 	"github.com/Nexters/myply/domain/service"
 
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/router"
+
 	"github.com/Nexters/myply/infrastructure/clients"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"github.com/Nexters/myply/infrastructure/logger"
@@ -37,15 +40,27 @@ func New() (*fiber.App, error) {
 		controller.Set,
 		service.Set,
 		memos.Set,
-		persistence.Set)))
+		persistence.Set,
+		member.Set)))
 }
 
+// @title MYPLY SERVER
+// @version 1.0
+// @description This is a sample swagger for Fiber
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email minkj1992@gmail.com
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host localhost:8080
+// @BasePath /
 func NewServer(
 	config *configs.Config,
 	logger *zap.SugaredLogger,
 	mongo *db.MongoInstance,
+	memberRouter router.MemberRouter,
+	memoRouter router.MemoRouter,
 	musicsRouter router.MusicsRouter,
-	mc *controller.MemoController,
 ) *fiber.App {
 	app := fiber.New(fiber.Config{
 		// Override default error handler
@@ -66,9 +81,8 @@ func NewServer(
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
-	app.Get("/v1/memos/:id", (*mc).GetMemo)
-	app.Post("/v1/memos", (*mc).AddMemo)
-
+	memberRouter.Init(&v1)
+	memoRouter.Init(&v1)
 	musicsRouter.Init(&v1)
 
 	return app
