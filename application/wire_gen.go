@@ -8,9 +8,11 @@ package application
 
 import (
 	"fmt"
+
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/router"
 	"github.com/Nexters/myply/docs"
+	"github.com/Nexters/myply/domain/member"
 	"github.com/Nexters/myply/domain/memos"
 	"github.com/Nexters/myply/domain/service"
 	"github.com/Nexters/myply/infrastructure/clients"
@@ -41,6 +43,14 @@ func New() (*fiber.App, error) {
 	if err != nil {
 		return nil, err
 	}
+	memberRepository := persistence.NewMemberRepository(mongoInstance, config)
+	memberService := member.NewMemberService(memberRepository)
+	memberController := controller.NewMemberController(memberService)
+	memberRouter := router.NewMemberRouter(memberController)
+	repository := persistence.NewMemoRepository(mongoInstance)
+	memosService := memos.NewMemoService(repository)
+	memoController := controller.NewMemoController(memosService)
+	memoRouter := router.NewMemoRouter(memoController)
 	youtubeClient, err := clients.NewYoutubeClient(config)
 	if err != nil {
 		return nil, err
@@ -48,21 +58,29 @@ func New() (*fiber.App, error) {
 	musicRepository := persistence.NewMusicRepository()
 	musicsService := service.NewMusicService(sugaredLogger, youtubeClient, musicRepository)
 	musicController := controller.NewMusicController(sugaredLogger, musicsService)
-	routerRouter := router.NewMusicsRouter(musicController)
-	repository := persistence.NewMemoRepository(mongoInstance)
-	memosService := memos.NewMemoService(repository)
-	memoController := controller.NewMemoController(memosService)
-	app := NewServer(config, sugaredLogger, mongoInstance, routerRouter, memoController)
+	musicsRouter := router.NewMusicsRouter(musicController)
+	app := NewServer(config, sugaredLogger, mongoInstance, memberRouter, memoRouter, musicsRouter)
 	return app, nil
 }
 
 // server.go:
 
+// @title MYPLY SERVER
+// @version 1.0
+// @description This is a sample swagger for Fiber
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email minkj1992@gmail.com
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host localhost:8080
+// @BasePath /
 func NewServer(
 	config *configs.Config, logger2 *zap.SugaredLogger,
 	mongo *db.MongoInstance,
+	memberRouter router.MemberRouter,
+	memoRouter router.MemoRouter,
 	musicsRouter router.MusicsRouter,
-	mc *controller.MemoController,
 ) *fiber.App {
 	app := fiber.New(fiber.Config{
 
@@ -83,9 +101,8 @@ func NewServer(
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
-	app.Get("/v1/memos/:id", (*mc).GetMemo)
-	app.Post("/v1/memos", (*mc).AddMemo)
-
+	memberRouter.Init(&v1)
+	memoRouter.Init(&v1)
 	musicsRouter.Init(&v1)
 
 	return app
