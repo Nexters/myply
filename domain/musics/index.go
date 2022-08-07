@@ -1,4 +1,4 @@
-package service
+package musics
 
 import "github.com/google/wire"
 

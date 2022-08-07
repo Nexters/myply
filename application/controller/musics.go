@@ -1,8 +1,7 @@
 package controller
 
 import (
-	"github.com/Nexters/myply/domain/entity"
-	"github.com/Nexters/myply/domain/service"
+	"github.com/Nexters/myply/domain/musics"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
@@ -13,10 +12,10 @@ type MusicController interface {
 
 type musicController struct {
 	logger       *zap.SugaredLogger
-	musicService service.MusicsService
+	musicService musics.Service
 }
 
-func NewMusicController(l *zap.SugaredLogger, ms service.MusicsService) MusicController {
+func NewMusicController(l *zap.SugaredLogger, ms musics.Service) MusicController {
 	return &musicController{logger: l, musicService: ms}
 }
 
@@ -58,7 +57,7 @@ func (mc *musicController) Search() fiber.Handler {
 
 	return func(ctx *fiber.Ctx) error {
 		var (
-			musics *entity.Musics
+			musics *musics.Musics
 			err    error
 		)
 		p := new(SearchQueryParams)
