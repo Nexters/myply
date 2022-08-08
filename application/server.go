@@ -6,6 +6,11 @@ package application
 import (
 	"fmt"
 	"github.com/Nexters/myply/domain"
+<<<<<<< HEAD
+=======
+
+	"github.com/Nexters/myply/domain/tag"
+>>>>>>> 89b6a17 (feat: made index for domain)
 
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/middleware"
