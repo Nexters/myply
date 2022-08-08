@@ -50,7 +50,7 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	token, err := c.checkDeviceToken(ctx)
+	token, err := c.deviceToken(ctx)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	token, err := c.checkDeviceToken(ctx)
+	token, err := c.deviceToken(ctx)
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(resp.toMap())
 }
 
-func (c *memoController) checkDeviceToken(ctx *fiber.Ctx) (string, error) {
+func (c *memoController) deviceToken(ctx *fiber.Ctx) (string, error) {
 	token := ctx.GetReqHeaders()["Device-Token"]
 	if token == "" {
 		resp := Response{
@@ -122,7 +122,7 @@ func (c *memoController) handleErrors(ctx *fiber.Ctx, err error) error {
 	case errors.Is(err, memos.NotFoundException):
 		resp.code = fiber.StatusNotFound
 		return ctx.Status(fiber.StatusNotFound).JSON(resp.toMap())
-	case errors.Is(err, memos.AlreadyExistsException):
+	case errors.Is(err, memos.AlreadyExistsException), errors.Is(err, memos.IllegalDeviceTokenException):
 		resp.code = fiber.StatusBadRequest
 		return ctx.Status(fiber.StatusBadRequest).JSON(resp.toMap())
 	default:

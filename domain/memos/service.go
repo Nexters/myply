@@ -44,10 +44,19 @@ func (s *memoService) AddMemo(videoId string, body string, deviceToken string) (
 }
 
 func (s *memoService) UpdateBody(id string, body string, deviceToken string) (*Memo, error) {
-	m, err := (*s.repository).UpdateBody(id, body)
+	old, err := s.GetMemo(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return m, err
+	if old.DeviceToken != deviceToken {
+		return nil, IllegalDeviceTokenException
+	}
+
+	updated, err := (*s.repository).UpdateBody(id, body)
+	if err != nil {
+		return nil, err
+	}
+
+	return updated, err
 }

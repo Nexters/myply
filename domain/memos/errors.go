@@ -1,6 +1,7 @@
 package memos
 
 var (
-	NotFoundException      error
-	AlreadyExistsException error
+	NotFoundException           error
+	AlreadyExistsException      error
+	IllegalDeviceTokenException error
 )
