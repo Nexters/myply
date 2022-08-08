@@ -59,3 +59,12 @@ func (s *memoService) UpdateBody(id string, body string, deviceToken string) (*M
 
 	return s.GetMemo(id)
 }
+
+func (s *memoService) UpdateBody(id string, body string, deviceToken string) (*Memo, error) {
+	m, err := (*s.repository).UpdateBody(id, body)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, err
+}
