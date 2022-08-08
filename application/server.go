@@ -5,11 +5,7 @@ package application
 
 import (
 	"fmt"
-
-	"github.com/Nexters/myply/domain/member"
-	"github.com/Nexters/myply/domain/memos"
-	"github.com/Nexters/myply/domain/musics"
-	"github.com/Nexters/myply/domain/tag"
+	"github.com/Nexters/myply/domain"
 
 	"github.com/Nexters/myply/application/controller"
 	"github.com/Nexters/myply/application/middleware"
@@ -38,11 +34,8 @@ func New() (*fiber.App, error) {
 		router.Set,
 		middleware.Set,
 		controller.Set,
-		memos.Set,
 		persistence.Set,
-		member.Set,
-		musics.Set,
-		tag.Set)))
+		domain.Set)))
 }
 
 // @title MYPLY SERVER
