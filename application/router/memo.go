@@ -22,6 +22,7 @@ func (mr *memoRouter) Init(root *fiber.Router) {
 	{
 		memoRouter.Get("/:id", mr.controller.GetMemo)
 		memoRouter.Post("/", mr.controller.AddMemo)
+		memoRouter.Patch("/:memoID", mr.controller.UpdateMemo)
 	}
 
 }
