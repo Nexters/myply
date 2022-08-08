@@ -87,17 +87,27 @@ func (r *MemoMongoRepository) GetMemoByVideoId(id string) (*memos.Memo, error) {
 	return md.toEntity(), nil
 }
 
-func (r *MemoMongoRepository) SaveMemo(videoId string, body string, deviceToken string) (string, error) {
+func (r *MemoMongoRepository) AddMemo(deviceToken string, videoId string, body string, tagIds []string) (string, error) {
 	coll := r.getCollection()
 
 	memoId := primitive.NewObjectID()
 	now := r.now()
+
+	var objectTagIds []primitive.ObjectID
+	for _, id := range tagIds {
+		objectId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return "", err
+		}
+		objectTagIds = append(objectTagIds, objectId)
+	}
+
 	md := MemoData{
 		ID:             memoId,
 		DeviceToken:    deviceToken,
 		YoutubeVideoId: videoId,
 		Body:           body,
-		TagIds:         nil, // TODO: change to real data
+		TagIds:         objectTagIds, // TODO: change to real data
 		CreatedAt:      *now,
 		UpdatedAt:      *now,
 	}

@@ -39,7 +39,8 @@ func (s *memoService) AddMemo(videoId string, body string, deviceToken string) (
 		return "", err
 	}
 
-	return (*s.repository).SaveMemo(videoId, body, deviceToken)
+	// TODO: add real tagIds
+	return (*s.repository).AddMemo(deviceToken, videoId, body, nil)
 }
 
 func (s *memoService) UpdateBody(id string, body string, deviceToken string) (*Memo, error) {
