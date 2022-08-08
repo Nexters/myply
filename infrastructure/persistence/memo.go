@@ -110,6 +110,27 @@ func (r *MemoMongoRepository) SaveMemo(videoId string, body string, deviceToken 
 	return insertResult.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
+func (r *MemoMongoRepository) UpdateBody(id string, body string) (*memos.Memo, error) {
+	coll := r.getCollection()
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	md := MemoData{}
+	if err = coll.FindOneAndUpdate(context.Background(), bson.M{"_id": objectId}, bson.M{"body": body}).Decode(&md); err != nil {
+		switch {
+		case errors.Is(err, mongo.ErrNoDocuments):
+			return nil, memos.NotFoundException
+		default:
+			return nil, err
+		}
+	}
+
+	return md.toEntity(), nil
+}
+
 func (r *MemoMongoRepository) getCollection() *mongo.Collection {
 	return r.conn.Collection(collectionName)
 }

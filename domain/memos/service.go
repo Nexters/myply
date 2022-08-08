@@ -7,6 +7,7 @@ import (
 type Service interface {
 	GetMemo(id string) (*Memo, error)
 	AddMemo(videoId string, body string, deviceToken string) (memoId string, e error)
+	UpdateBody(id string, body string, deviceToken string) (*Memo, error)
 }
 
 type memoService struct {
@@ -39,4 +40,13 @@ func (s *memoService) AddMemo(videoId string, body string, deviceToken string) (
 	}
 
 	return (*s.repository).SaveMemo(videoId, body, deviceToken)
+}
+
+func (s *memoService) UpdateBody(id string, body string, deviceToken string) (*Memo, error) {
+	m, err := (*s.repository).UpdateBody(id, body)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, err
 }

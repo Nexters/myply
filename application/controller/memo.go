@@ -10,6 +10,7 @@ import (
 type MemoController interface {
 	GetMemo(ctx *fiber.Ctx) error
 	AddMemo(ctx *fiber.Ctx) error
+	UpdateMemo(ctx *fiber.Ctx) error
 }
 
 type memoController struct {
@@ -27,14 +28,7 @@ func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 
 	m, err := (*c.service).GetMemo(id)
 	if err != nil {
-		switch {
-		case errors.Is(err, memos.NotFoundException):
-			resp = Response{code: fiber.StatusNotFound, message: err.Error(), data: fiber.Map{}}
-			return ctx.Status(fiber.StatusNotFound).JSON(resp.toMap())
-		default:
-			resp = Response{code: fiber.StatusInternalServerError, message: err.Error(), data: fiber.Map{}}
-			return ctx.Status(fiber.StatusInternalServerError).JSON(resp.toMap())
-		}
+		return c.handleErrors(ctx, err)
 	}
 
 	// TODO: respond real data
@@ -56,27 +50,14 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	token := ctx.GetReqHeaders()["Device-Token"]
-	if token == "" {
-		resp = Response{
-			code:    fiber.StatusBadRequest,
-			message: "failed due to empty device-token",
-			data:    fiber.Map{},
-		}
-		return ctx.Status(fiber.StatusBadRequest).JSON(resp.toMap())
+	token, err := c.checkDeviceToken(ctx)
+	if err != nil {
+		return err
 	}
 
 	id, err := (*c.service).AddMemo(req.YoutubeVideoId, req.Body, token)
 	if err != nil {
-		resp = Response{message: err.Error(), data: fiber.Map{}}
-		switch {
-		case errors.Is(err, memos.AlreadyExistsException):
-			resp.code = fiber.StatusBadRequest
-			return ctx.Status(fiber.StatusBadRequest).JSON(resp.toMap())
-		default:
-			resp.code = fiber.StatusInternalServerError
-			return ctx.Status(fiber.StatusInternalServerError).JSON(resp.toMap())
-		}
+		return c.handleErrors(ctx, err)
 	}
 
 	memoResp := MemoResponse{MemoId: id, ThumbnailURL: "", Title: "", Body: "", Keywords: []string{}}
@@ -87,12 +68,76 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(resp.toMap())
+}
 
+func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
+	var resp Response
+
+	id := ctx.Params("memoID")
+
+	req := new(patchRequest)
+	if err := ctx.BodyParser(req); err != nil {
+		return err
+	}
+
+	token, err := c.checkDeviceToken(ctx)
+	if err != nil {
+		return err
+	}
+
+	m, err := (*c.service).UpdateBody(id, req.Body, token)
+	if err != nil {
+		return c.handleErrors(ctx, err)
+	}
+
+	// TODO: respond real data
+	memoResp := MemoResponse{MemoId: m.Id, ThumbnailURL: "", Title: "", Body: m.Body, Keywords: []string{}}
+	resp = Response{
+		code:    fiber.StatusOK,
+		message: "",
+		data:    memoResp.toMap(),
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(resp.toMap())
+}
+
+func (c *memoController) checkDeviceToken(ctx *fiber.Ctx) (string, error) {
+	token := ctx.GetReqHeaders()["Device-Token"]
+	if token == "" {
+		resp := Response{
+			code:    fiber.StatusBadRequest,
+			message: "failed due to empty device-token",
+			data:    fiber.Map{},
+		}
+		return "", ctx.Status(fiber.StatusBadRequest).JSON(resp.toMap())
+	}
+
+	return token, nil
+}
+
+func (c *memoController) handleErrors(ctx *fiber.Ctx, err error) error {
+	resp := Response{message: err.Error(), data: fiber.Map{}}
+
+	switch {
+	case errors.Is(err, memos.NotFoundException):
+		resp.code = fiber.StatusNotFound
+		return ctx.Status(fiber.StatusNotFound).JSON(resp.toMap())
+	case errors.Is(err, memos.AlreadyExistsException):
+		resp.code = fiber.StatusBadRequest
+		return ctx.Status(fiber.StatusBadRequest).JSON(resp.toMap())
+	default:
+		resp.code = fiber.StatusInternalServerError
+		return ctx.Status(fiber.StatusInternalServerError).JSON(resp.toMap())
+	}
 }
 
 type addRequest struct {
 	YoutubeVideoId string `json:"youtubeVideoId"`
 	Body           string `json:"body"`
+}
+
+type patchRequest struct {
+	Body string `json:"body"`
 }
 
 type MemoResponse struct {
