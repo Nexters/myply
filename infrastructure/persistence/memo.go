@@ -120,25 +120,26 @@ func (r *MemoMongoRepository) AddMemo(deviceToken string, videoId string, body s
 	return insertResult.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-func (r *MemoMongoRepository) UpdateBody(id string, body string) (*memos.Memo, error) {
+func (r *MemoMongoRepository) UpdateBody(id string, body string) error {
 	coll := r.getCollection()
 
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	md := MemoData{}
-	if err = coll.FindOneAndUpdate(context.Background(), bson.M{"_id": objectId}, bson.M{"body": body}).Decode(&md); err != nil {
+	filter := bson.M{"_id": objectId}
+	update := bson.D{{"$set", bson.D{{"body", body}}}}
+	if _, err = coll.UpdateOne(context.Background(), filter, update); err != nil {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
-			return nil, memos.NotFoundException
+			return memos.NotFoundException
 		default:
-			return nil, err
+			return err
 		}
 	}
 
-	return md.toEntity(), nil
+	return nil
 }
 
 func (r *MemoMongoRepository) getCollection() *mongo.Collection {

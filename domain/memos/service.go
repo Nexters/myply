@@ -53,10 +53,9 @@ func (s *memoService) UpdateBody(id string, body string, deviceToken string) (*M
 		return nil, IllegalDeviceTokenException
 	}
 
-	updated, err := (*s.repository).UpdateBody(id, body)
-	if err != nil {
+	if err = (*s.repository).UpdateBody(id, body); err != nil {
 		return nil, err
 	}
 
-	return updated, err
+	return s.GetMemo(id)
 }
