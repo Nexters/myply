@@ -36,12 +36,24 @@ func (mc *memberController) SignUp() fiber.Handler {
 		if signUpErr != nil {
 			msg := signUpErr.Error()
 			if strings.HasPrefix(msg, "409:") {
-				return c.Status(409).SendString("fail: account already exist")
+				return c.Status(409).JSON(BaseResponse{
+					Code:    409,
+					Message: "fail: account already exist",
+					Data:    nil,
+				})
 			}
 
-			return c.Status(500).SendString("fail: internal server error")
+			return c.Status(500).JSON(BaseResponse{
+				Code:    500,
+				Message: "fail: internal server error",
+				Data:    nil,
+			})
 		}
 
-		return c.Status(201).SendString("success: sign up")
+		return c.Status(201).JSON(BaseResponse{
+			Code:    201,
+			Message: "success: sign up",
+			Data:    nil,
+		})
 	}
 }
