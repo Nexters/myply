@@ -2,7 +2,6 @@ package clients
 
 import (
 	"context"
-
 	"github.com/Nexters/myply/infrastructure/configs"
 	"google.golang.org/api/option"
 	v3 "google.golang.org/api/youtube/v3"
@@ -22,12 +21,13 @@ const (
 	regionCode    = "kr"
 	videoDuration = "long" // more than 20m
 	maxResults    = 25
+	defaultOrder  = "relevance"
 )
 
 type TagMap map[string][]string
 
 type YoutubeClient interface {
-	SearchPlaylist(q string) (*v3.SearchListResponse, error)
+	SearchPlaylist(q string, order string) (*v3.SearchListResponse, error)
 	ParseVideoIds(items []*v3.SearchResult) []string
 	ParseVideoTags(ids []string) (TagMap, error)
 }
@@ -49,14 +49,18 @@ func NewYoutubeClient(config *configs.Config) (YoutubeClient, error) {
 	return &youtubeClient{service}, nil
 }
 
-func (yc *youtubeClient) SearchPlaylist(q string) (*v3.SearchListResponse, error) {
+func (yc *youtubeClient) SearchPlaylist(q string, order string) (*v3.SearchListResponse, error) {
+	if order == "" {
+		order = defaultOrder
+	}
+
 	call := yc.service.Search.List([]string{"id, snippet"}).
 		Q(q).
 		Type(targetTypes...).
 		RegionCode(regionCode).
 		VideoCategoryId(videoCategory).
 		VideoDuration(videoDuration).
-		// Order(). // TODO: viewCount, date
+		Order(order).
 		MaxResults(maxResults)
 
 	response, err := call.Do()

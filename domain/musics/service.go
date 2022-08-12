@@ -9,8 +9,28 @@ import (
 	"go.uber.org/zap"
 )
 
+type Order string
+
+const (
+	OrderByViewCount Order = "viewCount"
+	OrderByDate            = "date"
+	OrderByDefault         = "relevance"
+)
+
+func (o Order) String() string {
+	switch o {
+	case OrderByViewCount:
+		return "viewCount"
+	case OrderByDate:
+		return "date"
+	default:
+		return "relevance"
+	}
+}
+
 type Service interface {
-	GetPopularList(rawQueries []string) (*Musics, error) // TODO: pagination
+	GetMusicList(rawQueries []string) (*Musics, error) // TODO: pagination
+	GetPlayListBy(order Order) (*Musics, error)
 }
 
 type musicService struct {
@@ -22,8 +42,12 @@ func NewMusicService(l *zap.SugaredLogger, mr MusicRepository, c *configs.Config
 	return &musicService{logger: l, musicRepository: mr}
 }
 
+func (ms *musicService) GetPlayListBy(order Order) (*Musics, error) {
+	return ms.musicRepository.GetPlayListBy(order.String())
+}
+
 // MongoCacheTTL
-func (ms *musicService) GetPopularList(rawQueries []string) (*Musics, error) {
+func (ms *musicService) GetMusicList(rawQueries []string) (*Musics, error) {
 	// TODO: parse korean sentence to []noun
 	queries := strings.Join(rawQueries, ",")
 	musics, isCached, err := ms.musicRepository.GetMusicList(queries)
