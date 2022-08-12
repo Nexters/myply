@@ -24,7 +24,7 @@ func NewMemoController(s *memos.Service) MemoController {
 func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 	var resp Response
 
-	id := ctx.Params("id")
+	id := ctx.Params("memoID")
 
 	m, err := (*c.service).GetMemo(id)
 	if err != nil {

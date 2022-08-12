@@ -20,7 +20,7 @@ func NewMemoRouter(mc controller.MemoController) MemoRouter {
 func (mr *memoRouter) Init(root *fiber.Router) {
 	memoRouter := (*root).Group("/memos")
 	{
-		memoRouter.Get("/:id", mr.controller.GetMemo)
+		memoRouter.Get("/:memoID", mr.controller.GetMemo)
 		memoRouter.Post("/", mr.controller.AddMemo)
 		memoRouter.Patch("/:memoID", mr.controller.UpdateMemo)
 	}
