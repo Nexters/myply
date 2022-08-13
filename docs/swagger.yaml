@@ -140,6 +140,30 @@ paths:
       summary: Sign up
       tags:
       - members
+  /musics:
+    get:
+      consumes:
+      - application/json
+      description: 플레이리스트 조회
+      parameters:
+      - in: query
+        name: nextToken
+        type: string
+      - in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.ListMusicResponse'
+        "500":
+          description: Internal Server Error
+      summary: Retrieve music playlist
+      tags:
+      - musics
   /musics/search:
     get:
       consumes:
@@ -148,9 +172,6 @@ paths:
       parameters:
       - in: query
         name: nextToken
-        type: string
-      - in: query
-        name: order
         type: string
       - in: query
         items:
@@ -165,7 +186,7 @@ paths:
           schema:
             $ref: '#/definitions/controller.ListMusicResponse'
         "500":
-          description: ""
+          description: Internal Server Error
       summary: Search music playlist
       tags:
       - musics
