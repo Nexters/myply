@@ -7,7 +7,7 @@ import (
 var Set = wire.NewSet(NewMemberService)
 
 type MemberService interface {
-	SignUp(deviceToken string, name string) error
+	SignUp(deviceToken string, name string, keywords []string) error
 }
 
 type memberService struct {
@@ -18,8 +18,8 @@ func NewMemberService(repo MemberRepository) MemberService {
 	return &memberService{repo: repo}
 }
 
-func (ms *memberService) SignUp(deviceToken string, name string) error {
-	entity := Member{DeviceToken: deviceToken, Name: name}
+func (ms *memberService) SignUp(deviceToken string, name string, keywords []string) error {
+	entity := Member{DeviceToken: deviceToken, Name: name, Keywords: keywords}
 
 	return ms.repo.Create(entity)
 }

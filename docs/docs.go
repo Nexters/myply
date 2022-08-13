@@ -224,6 +224,12 @@ const docTemplate = `{
                 "deviceToken": {
                     "type": "string"
                 },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "name": {
                     "type": "string"
                 }

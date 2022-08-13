@@ -12,8 +12,9 @@ type MemberController interface {
 }
 
 type signUpDTO struct {
-	DeviceToken string `json:"deviceToken"`
-	Name        string `json:"name"`
+	DeviceToken string   `json:"deviceToken"`
+	Name        string   `json:"name"`
+	Keywords    []string `json:"keywords"`
 }
 
 type memberController struct {
@@ -42,7 +43,11 @@ func (mc *memberController) SignUp() fiber.Handler {
 			return err
 		}
 
-		signUpErr := mc.service.SignUp(dto.DeviceToken, dto.Name)
+		signUpErr := mc.service.SignUp(
+			dto.DeviceToken,
+			dto.Name,
+			dto.Keywords,
+		)
 		if signUpErr != nil {
 			msg := signUpErr.Error()
 			if strings.HasPrefix(msg, "409:") {

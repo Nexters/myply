@@ -12,8 +12,9 @@ import (
 )
 
 type memberData struct {
-	DeviceToken string `json:"id" bson:"_id"`
-	Name        string `json:"name"`
+	DeviceToken string   `json:"id" bson:"_id"`
+	Name        string   `json:"name"`
+	Keywords    []string `json:"keywords"`
 }
 
 type memberRepository struct {
@@ -40,7 +41,11 @@ func (mr *memberRepository) Create(entity member.Member) error {
 
 	switch findErr {
 	case mongo.ErrNoDocuments:
-		data := memberData{entity.DeviceToken, entity.Name}
+		data := memberData{
+			DeviceToken: entity.DeviceToken,
+			Name:        entity.Name,
+			Keywords:    entity.Keywords,
+		}
 		_, insertErr := collection.InsertOne(ctx, data)
 
 		return insertErr
