@@ -1,5 +1,13 @@
 basePath: /
 definitions:
+  controller.BaseResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
   controller.ListMusicResponse:
     properties:
       code:
@@ -28,6 +36,13 @@ definitions:
       youtubeVideoID:
         type: string
     type: object
+  controller.signUpDTO:
+    properties:
+      deviceToken:
+        type: string
+      name:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -41,6 +56,32 @@ info:
   title: MYPLY SERVER
   version: "1.0"
 paths:
+  /members/:
+    post:
+      consumes:
+      - application/json
+      description: 회원가입
+      parameters:
+      - description: sign up body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.signUpDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.BaseResponse'
+        "409":
+          description: Account already exist
+        "500":
+          description: Internal server error
+      summary: Sign up
+      tags:
+      - members
   /musics/search:
     get:
       consumes:

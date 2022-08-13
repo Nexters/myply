@@ -24,6 +24,46 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/members/": {
+            "post": {
+                "description": "회원가입",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "members"
+                ],
+                "summary": "Sign up",
+                "parameters": [
+                    {
+                        "description": "sign up body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.signUpDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.BaseResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Account already exist"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/musics/search": {
             "get": {
                 "description": "플레이리스트 검색",
@@ -72,6 +112,18 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "controller.BaseResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "controller.ListMusicResponse": {
             "type": "object",
             "properties": {
@@ -111,6 +163,17 @@ const docTemplate = `{
                     }
                 },
                 "youtubeVideoID": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.signUpDTO": {
+            "type": "object",
+            "properties": {
+                "deviceToken": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }

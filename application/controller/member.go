@@ -24,6 +24,16 @@ func NewMemberController(ms member.MemberService) MemberController {
 	return &memberController{service: ms}
 }
 
+// @Summary Sign up
+// @Description 회원가입
+// @Tags members
+// @Accept json
+// @Produce json
+// @Param body body signUpDTO true "sign up body"
+// @Success 200 {object} BaseResponse
+// @Failure 409 "Account already exist"
+// @Failure 500 "Internal server error"
+// @Router /members/ [post]
 func (mc *memberController) SignUp() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		dto := new(signUpDTO)
