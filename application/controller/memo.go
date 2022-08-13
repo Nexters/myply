@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"errors"
-
 	"github.com/Nexters/myply/domain/memos"
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,7 +26,7 @@ func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 
 	m, err := (*c.service).GetMemo(id)
 	if err != nil {
-		return c.handleErrors(ctx, err)
+		return c.handleErrors(err)
 	}
 
 	// TODO: respond real data
@@ -57,7 +55,7 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 
 	id, err := (*c.service).AddMemo(req.YoutubeVideoId, req.Body, token)
 	if err != nil {
-		return c.handleErrors(ctx, err)
+		return c.handleErrors(err)
 	}
 
 	memoResp := MemoResponse{MemoId: id, ThumbnailURL: "", Title: "", Body: "", Keywords: []string{}}
@@ -87,7 +85,7 @@ func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 
 	m, err := (*c.service).UpdateBody(id, req.Body, token)
 	if err != nil {
-		return c.handleErrors(ctx, err)
+		return c.handleErrors(err)
 	}
 
 	// TODO: respond real data
@@ -104,30 +102,20 @@ func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 func (c *memoController) deviceToken(ctx *fiber.Ctx) (string, error) {
 	token := ctx.GetReqHeaders()["Device-Token"]
 	if token == "" {
-		resp := Response{
-			code:    fiber.StatusBadRequest,
-			message: "failed due to empty device-token",
-			data:    fiber.Map{},
-		}
-		return "", ctx.Status(fiber.StatusBadRequest).JSON(resp.toMap())
+		return "", fiber.NewError(fiber.StatusBadRequest, "empty device-token")
 	}
 
 	return token, nil
 }
 
-func (c *memoController) handleErrors(ctx *fiber.Ctx, err error) error {
-	resp := Response{message: err.Error(), data: fiber.Map{}}
-
-	switch {
-	case errors.Is(err, memos.NotFoundException):
-		resp.code = fiber.StatusNotFound
-		return ctx.Status(fiber.StatusNotFound).JSON(resp.toMap())
-	case errors.Is(err, memos.AlreadyExistsException), errors.Is(err, memos.IllegalDeviceTokenException):
-		resp.code = fiber.StatusBadRequest
-		return ctx.Status(fiber.StatusBadRequest).JSON(resp.toMap())
+func (c *memoController) handleErrors(err error) error {
+	switch err.(type) {
+	case *memos.NotFoundError:
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	case *memos.AlreadyExistsError, *memos.IllegalDeviceTokenError:
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	default:
-		resp.code = fiber.StatusInternalServerError
-		return ctx.Status(fiber.StatusInternalServerError).JSON(resp.toMap())
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 }
 

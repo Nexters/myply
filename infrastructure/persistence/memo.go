@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/Nexters/myply/domain/memos"
 	"github.com/Nexters/myply/infrastructure/persistence/db"
 	"go.mongodb.org/mongo-driver/bson"
@@ -62,7 +63,7 @@ func (r *MemoMongoRepository) GetMemo(id string) (*memos.Memo, error) {
 	if err = coll.FindOne(context.Background(), bson.M{"_id": objectId}).Decode(&md); err != nil {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
-			return nil, memos.NotFoundException
+			return nil, &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. id=%s", id)}
 		default:
 			return nil, err
 		}
@@ -78,7 +79,7 @@ func (r *MemoMongoRepository) GetMemoByVideoId(id string) (*memos.Memo, error) {
 	if err := coll.FindOne(context.Background(), bson.M{"youtubeVideoId": id}).Decode(&md); err != nil {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
-			return nil, memos.NotFoundException
+			return nil, &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. videoID=%s", id)}
 		default:
 			return nil, err
 		}
@@ -133,7 +134,7 @@ func (r *MemoMongoRepository) UpdateBody(id string, body string) error {
 	if _, err = coll.UpdateOne(context.Background(), filter, update); err != nil {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
-			return memos.NotFoundException
+			return &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. id=%s", id)}
 		default:
 			return err
 		}
