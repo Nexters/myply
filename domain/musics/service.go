@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/Nexters/myply/infrastructure/configs"
-	"github.com/Nexters/myply/infrastructure/persistence/cache"
 	"go.uber.org/zap"
 )
 
@@ -18,7 +16,7 @@ type musicService struct {
 	musicRepository MusicRepository
 }
 
-func NewMusicService(l *zap.SugaredLogger, mr MusicRepository, c *configs.Config, cc cache.Cache) Service {
+func NewMusicService(l *zap.SugaredLogger, mr MusicRepository) Service {
 	return &musicService{logger: l, musicRepository: mr}
 }
 

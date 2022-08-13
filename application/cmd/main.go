@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/Nexters/myply/application"
 )
@@ -11,5 +13,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	log.Fatal(app.Listen(":8080"))
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
 }

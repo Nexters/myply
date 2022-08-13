@@ -9,6 +9,9 @@ WORKDIR /build
 COPY go.mod go.sum ./
 RUN go mod download
 
+# https://stackoverflow.com/a/56103707
+RUN apk add --no-cache ca-certificates
+
 # Copy the code into the container.
 COPY . .
 

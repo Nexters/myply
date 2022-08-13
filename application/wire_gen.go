@@ -60,7 +60,7 @@ func New() (*fiber.App, error) {
 		return nil, err
 	}
 	musicRepository := persistence.NewMusicRepository(config, cacheCache, youtubeClient)
-	musicsService := musics.NewMusicService(sugaredLogger, musicRepository, config, cacheCache)
+	musicsService := musics.NewMusicService(sugaredLogger, musicRepository)
 	musicController := controller.NewMusicController(sugaredLogger, musicsService)
 	musicsRouter := router.NewMusicsRouter(musicController)
 	tagRepository := persistence.NewTagRepository()
