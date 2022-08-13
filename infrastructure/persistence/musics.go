@@ -55,7 +55,7 @@ func (m *MusicRepository) GetMusicList(q string) (musicListResponse *musics.Musi
 	}
 
 	var musicsV3 *v3.SearchListResponse
-	musicsV3, err = m.yc.SearchPlaylist(fmt.Sprintf("playlist,%s", q))
+	musicsV3, err = m.yc.SearchPlaylist(fmt.Sprintf("playlist,%s", q), "")
 	if err != nil {
 		return nil, false, err
 	}
@@ -69,4 +69,18 @@ func (m *MusicRepository) GetMusicList(q string) (musicListResponse *musics.Musi
 
 func (m *MusicRepository) SaveMusicList(key string, musicList []byte) error {
 	return m.cc.Set(key, musicList, m.c.MongoCacheTTL)
+}
+
+func (m *MusicRepository) GetPlayListBy(order string) (musicListResponse *musics.Musics, err error) {
+	var musicsV3 *v3.SearchListResponse
+	musicsV3, err = m.yc.SearchPlaylist("", order)
+	if err != nil {
+		return nil, err
+	}
+
+	if musicListResponse, err = m.buildMusicListResponse(musicsV3.Items); err != nil {
+		return nil, err
+	}
+
+	return musicListResponse, nil
 }

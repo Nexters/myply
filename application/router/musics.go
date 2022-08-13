@@ -20,6 +20,7 @@ func NewMusicsRouter(mc controller.MusicController) MusicsRouter {
 func (mr *musicsRouter) Init(root *fiber.Router) {
 	musicsRouter := (*root).Group("/musics")
 	{
+		musicsRouter.Get("/", mr.musicsController.Retrieve())
 		musicsRouter.Get("/search", mr.musicsController.Search())
 	}
 }
