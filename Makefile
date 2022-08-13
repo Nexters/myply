@@ -38,6 +38,11 @@ docker.fiber.build:
 	make wire
 	docker build -t fiber .
 
+docker.fiber.local:
+	make docker.fiber.build
+	docker run --rm -p 8080:8080 --name $(APP_NAME) --env-file ./.env.local fiber
+
+
 docker.fiber:
 	make docker.fiber.build
 	docker run --rm -p 8080:8080 --name $(APP_NAME) --env PHASE=prod fiber
