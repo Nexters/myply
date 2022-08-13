@@ -112,6 +112,8 @@ paths:
           description: Unautorized
         "500":
           description: Internal server error
+      security:
+      - ApiKeyAuth: []
       summary: Get user info
       tags:
       - members
@@ -160,7 +162,9 @@ paths:
           schema:
             $ref: '#/definitions/controller.ListMusicResponse'
         "500":
-          description: Internal Server Error
+          description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Retrieve music playlist
       tags:
       - musics
@@ -186,7 +190,9 @@ paths:
           schema:
             $ref: '#/definitions/controller.ListMusicResponse'
         "500":
-          description: Internal Server Error
+          description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Search music playlist
       tags:
       - musics
@@ -204,7 +210,14 @@ paths:
             $ref: '#/definitions/controller.RecommendResponse'
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Get recommended tags
       tags:
       - tags
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Device-Token
+    type: apiKey
 swagger: "2.0"

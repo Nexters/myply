@@ -26,6 +26,11 @@ const docTemplate = `{
     "paths": {
         "/members/": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "get myply member defail information",
                 "consumes": [
                     "application/json"
@@ -93,6 +98,11 @@ const docTemplate = `{
         },
         "/musics": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "플레이리스트 조회",
                 "consumes": [
                     "application/json"
@@ -124,13 +134,18 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": ""
                     }
                 }
             }
         },
         "/musics/search": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "플레이리스트 검색",
                 "consumes": [
                     "application/json"
@@ -165,13 +180,18 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": ""
                     }
                 }
             }
         },
         "/tags/recommend": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "get tags recommended by myply",
                 "consumes": [
                     "application/json"
@@ -325,6 +345,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Device-Token",
+            "in": "header"
         }
     }
 }`
