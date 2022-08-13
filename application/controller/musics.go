@@ -113,7 +113,7 @@ func (mc *musicController) Search() fiber.Handler {
 // @Tags         musics
 // @Accept       json
 // @Produce      json
-// @Param payload order RetrieveQueryParams true "query params"
+// @Param payload query RetrieveQueryParams true "query params"
 // @Success      200  {object}   ListMusicResponse
 // @Failure      500
 // @Router       /musics [get]

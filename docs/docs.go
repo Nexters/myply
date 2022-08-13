@@ -91,6 +91,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/musics": {
+            "get": {
+                "description": "플레이리스트 조회",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "musics"
+                ],
+                "summary": "Retrieve music playlist",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "nextToken",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ListMusicResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/musics/search": {
             "get": {
                 "description": "플레이리스트 검색",
@@ -111,11 +149,6 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -132,7 +165,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": ""
+                        "description": "Internal Server Error"
                     }
                 }
             }
