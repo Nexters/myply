@@ -75,16 +75,9 @@ func New() (*fiber.App, error) {
 
 // server.go:
 
-// @title MYPLY SERVER
-// @version 1.0
-// @description This is a sample swagger for Fiber
-// @termsOfService http://swagger.io/terms/
-// @contact.name API Support
-// @contact.email minkj1992@gmail.com
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host localhost:8080
-// @BasePath /
+// @securityDefinitions.apikey  ApiKeyAuth
+// @in                          header
+// @name                        Device-Token
 func NewServer(
 	config *configs.Config,
 	authMiddleware middleware.AuthMiddleware,

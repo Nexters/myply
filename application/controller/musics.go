@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+
 	"github.com/Nexters/myply/domain/musics"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
@@ -72,6 +73,7 @@ type ListMusicResponse struct {
 // @Success      200  {object}   ListMusicResponse
 // @Failure      500
 // @Router       /musics/search [get]
+// @Security ApiKeyAuth
 func (mc *musicController) Search() fiber.Handler {
 
 	return func(ctx *fiber.Ctx) error {
@@ -117,6 +119,7 @@ func (mc *musicController) Search() fiber.Handler {
 // @Success      200  {object}   ListMusicResponse
 // @Failure      500
 // @Router       /musics [get]
+// @Security ApiKeyAuth
 func (mc *musicController) Retrieve() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		p := new(RetrieveQueryParams)

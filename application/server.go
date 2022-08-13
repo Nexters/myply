@@ -55,6 +55,10 @@ func New() (*fiber.App, error) {
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /
+
+// @securityDefinitions.apikey  ApiKeyAuth
+// @in                          header
+// @name                        Device-Token
 func NewServer(
 	config *configs.Config,
 	authMiddleware middleware.AuthMiddleware,

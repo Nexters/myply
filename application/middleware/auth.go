@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/Nexters/myply/application/controller"
@@ -14,7 +15,7 @@ type AuthMiddleware interface {
 
 type authMiddleware struct {
 	memberRepository member.MemberRepository
-	Targets          []string
+	WhiteList        []string
 }
 
 func (a *authMiddleware) New() fiber.Handler {
@@ -40,23 +41,23 @@ func (a *authMiddleware) New() fiber.Handler {
 }
 
 func (a *authMiddleware) isTarget(method, path string) bool {
-	targets := a.Targets
+	targets := a.WhiteList
 	target := strings.ToUpper(method) + " " + path
+	fmt.Println(target)
 
 	for i := range targets {
 		if targets[i] == target {
-			return true
+			return false
 		}
 	}
-
-	return false
+	return true
 }
 
 func NewAuthMiddleware(memberRepository member.MemberRepository) AuthMiddleware {
 	return &authMiddleware{
 		memberRepository: memberRepository,
-		Targets: []string{
-			"GET /api/v1/members/",
+		WhiteList: []string{
+			"POST /api/v1/members/",
 		},
 	}
 }

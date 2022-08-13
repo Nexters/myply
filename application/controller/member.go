@@ -94,6 +94,7 @@ func (mc *memberController) SignUp() fiber.Handler {
 // @Failure 401 "Unautorized"
 // @Failure 500 "Internal server error"
 // @Router /members/ [get]
+// @Security ApiKeyAuth
 func (mc *memberController) Get() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		member := c.Locals("member").(*member.Member)

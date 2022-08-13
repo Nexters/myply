@@ -36,6 +36,7 @@ func NewTagController(ts tag.TagService) TagController {
 // @Success 200 {object} RecommendResponse
 // @Failure 500
 // @Router /tags/recommend [get]
+// @Security ApiKeyAuth
 func (tc *tagController) Recommend() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		tags, err := tc.service.Recommend()
