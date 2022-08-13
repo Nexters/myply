@@ -74,8 +74,9 @@ func NewConfig() (*Config, error) {
 		return nil, err
 	}
 	return &Config{
-		Phase:                 phase,
-		BaseURI:               os.Getenv("BASE_URI"),
+		Phase:   phase,
+		BaseURI: "myply-server-rwwy3wj4sa-du.a.run.app",
+		// BaseURI:               os.Getenv("BASE_URI"),
 		MongoURI:              os.Getenv("MONGO_URI"),
 		MongoDBName:           os.Getenv("MONGO_DB_NAME"),
 		MongoTTL:              time.Duration(mongoTTL) * time.Second,
