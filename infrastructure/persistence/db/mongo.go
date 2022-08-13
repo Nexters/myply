@@ -35,10 +35,12 @@ func NewMongoDB(config *configs.Config) (*MongoInstance, error) {
 
 	client, err := mongo.NewClient(clientOptions)
 	if err != nil {
+
 		return nil, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), config.MongoTTL)
+
 	defer cancel()
 
 	err = client.Connect(ctx)
