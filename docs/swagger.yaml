@@ -36,6 +36,22 @@ definitions:
       youtubeVideoID:
         type: string
     type: object
+  controller.RecommendResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/controller.RecommendResponseData'
+      message:
+        type: string
+    type: object
+  controller.RecommendResponseData:
+    properties:
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
   controller.signUpDTO:
     properties:
       deviceToken:
@@ -60,7 +76,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 회원가입
+      description: join myply members
       parameters:
       - description: sign up body
         in: body
@@ -111,4 +127,21 @@ paths:
       summary: Search music playlist
       tags:
       - musics
+  /tags/recommend:
+    get:
+      consumes:
+      - application/json
+      description: get tags recommended by myply
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.RecommendResponse'
+        "500":
+          description: ""
+      summary: Get recommended tags
+      tags:
+      - tags
 swagger: "2.0"

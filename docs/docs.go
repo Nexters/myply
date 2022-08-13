@@ -26,7 +26,7 @@ const docTemplate = `{
     "paths": {
         "/members/": {
             "post": {
-                "description": "회원가입",
+                "description": "join myply members",
                 "consumes": [
                     "application/json"
                 ],
@@ -109,6 +109,32 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/tags/recommend": {
+            "get": {
+                "description": "get tags recommended by myply",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Get recommended tags",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.RecommendResponse"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -164,6 +190,31 @@ const docTemplate = `{
                 },
                 "youtubeVideoID": {
                     "type": "string"
+                }
+            }
+        },
+        "controller.RecommendResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/controller.RecommendResponseData"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.RecommendResponseData": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

@@ -19,10 +19,23 @@ type RecommendResponseData struct {
 	Tags []string `json:"tags"`
 }
 
+type RecommendResponse struct {
+	BaseResponse
+	Data RecommendResponseData `json:"data"`
+}
+
 func NewTagController(ts tag.TagService) TagController {
 	return &tagController{service: ts}
 }
 
+// @Summary Get recommended tags
+// @Description get tags recommended by myply
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Success 200 {object} RecommendResponse
+// @Failure 500
+// @Router /tags/recommend [get]
 func (tc *tagController) Recommend() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		tags, err := tc.service.Recommend()

@@ -25,7 +25,7 @@ func NewMemberController(ms member.MemberService) MemberController {
 }
 
 // @Summary Sign up
-// @Description 회원가입
+// @Description join myply members
 // @Tags members
 // @Accept json
 // @Produce json
