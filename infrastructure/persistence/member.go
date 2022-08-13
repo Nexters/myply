@@ -30,6 +30,24 @@ func NewMemberRepository(mongo *db.MongoInstance, config *configs.Config) member
 	return &memberRepository{mongo: mongo, config: config}
 }
 
+func (mr *memberRepository) Get(deviceToken string) (*member.Member, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), mr.config.MongoTTL)
+	defer cancel()
+
+	collection := mr.mongo.Db.Collection(memberCollectionName)
+
+	var result memberData
+	if err := collection.FindOne(ctx, bson.D{{Key: "_id", Value: deviceToken}}).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &member.Member{
+		DeviceToken: result.DeviceToken,
+		Name:        result.Name,
+		Keywords:    result.Keywords,
+	}, nil
+}
+
 func (mr *memberRepository) Create(entity member.Member) error {
 	ctx, cancel := context.WithTimeout(context.Background(), mr.config.MongoTTL)
 	defer cancel()

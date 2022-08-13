@@ -19,6 +19,15 @@ definitions:
       message:
         type: string
     type: object
+  controller.MemberResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/controller.memberResponseData'
+      message:
+        type: string
+    type: object
   controller.MusicResponse:
     properties:
       isMemoed:
@@ -52,6 +61,17 @@ definitions:
           type: string
         type: array
     type: object
+  controller.memberResponseData:
+    properties:
+      deviceToken:
+        type: string
+      keywords:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    type: object
   controller.signUpDTO:
     properties:
       deviceToken:
@@ -77,6 +97,24 @@ info:
   version: "1.0"
 paths:
   /members/:
+    get:
+      consumes:
+      - application/json
+      description: get myply member defail information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.MemberResponse'
+        "401":
+          description: Unautorized
+        "500":
+          description: Internal server error
+      summary: Get user info
+      tags:
+      - members
     post:
       consumes:
       - application/json

@@ -9,6 +9,7 @@ package application
 import (
 	"fmt"
 	"github.com/Nexters/myply/application/controller"
+	"github.com/Nexters/myply/application/middleware"
 	"github.com/Nexters/myply/application/router"
 	"github.com/Nexters/myply/docs"
 	"github.com/Nexters/myply/domain/member"
@@ -40,6 +41,7 @@ func New() (*fiber.App, error) {
 		return nil, err
 	}
 	memberRepository := persistence.NewMemberRepository(mongoInstance, config)
+	authMiddleware := middleware.NewAuthMiddleware(memberRepository)
 	memberService := member.NewMemberService(memberRepository)
 	memberController := controller.NewMemberController(memberService)
 	memberRouter := router.NewMemberRouter(memberController)
@@ -67,7 +69,7 @@ func New() (*fiber.App, error) {
 	tagService := tag.NewTagService(tagRepository)
 	tagController := controller.NewTagController(tagService)
 	tagRouter := router.NewTagRouter(tagController)
-	app := NewServer(config, memberRouter, memoRouter, musicsRouter, tagRouter)
+	app := NewServer(config, authMiddleware, memberRouter, memoRouter, musicsRouter, tagRouter)
 	return app, nil
 }
 
@@ -85,6 +87,7 @@ func New() (*fiber.App, error) {
 // @BasePath /
 func NewServer(
 	config *configs.Config,
+	authMiddleware middleware.AuthMiddleware,
 	memberRouter router.MemberRouter,
 	memoRouter router.MemoRouter,
 	musicsRouter router.MusicsRouter,
@@ -108,6 +111,7 @@ func NewServer(
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
+	v1.Use(authMiddleware.New())
 	memberRouter.Init(&v1)
 	memoRouter.Init(&v1)
 	musicsRouter.Init(&v1)

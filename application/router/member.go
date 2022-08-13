@@ -20,6 +20,7 @@ func NewMemberRouter(mc controller.MemberController) MemberRouter {
 func (mr *memberRouter) Init(root *fiber.Router) {
 	memberRouter := (*root).Group("/members")
 	{
+		memberRouter.Get("/", mr.controller.Get())
 		memberRouter.Post("/", mr.controller.SignUp())
 	}
 }

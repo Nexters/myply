@@ -9,12 +9,24 @@ import (
 
 type MemberController interface {
 	SignUp() fiber.Handler
+	Get() fiber.Handler
 }
 
 type signUpDTO struct {
 	DeviceToken string   `json:"deviceToken"`
 	Name        string   `json:"name"`
 	Keywords    []string `json:"keywords"`
+}
+
+type memberResponseData struct {
+	DeviceToken string   `json:"deviceToken"`
+	Name        string   `json:"name"`
+	Keywords    []string `json:"keywords"`
+}
+
+type MemberResponse struct {
+	BaseResponse
+	Data memberResponseData `json:"data"`
 }
 
 type memberController struct {
@@ -70,5 +82,33 @@ func (mc *memberController) SignUp() fiber.Handler {
 			Message: "success: sign up",
 			Data:    nil,
 		})
+	}
+}
+
+// @Summary Get user info
+// @Description get myply member defail information
+// @Tags members
+// @Accept json
+// @Produce json
+// @Success 200 {object} MemberResponse
+// @Failure 401 "Unautorized"
+// @Failure 500 "Internal server error"
+// @Router /members/ [get]
+func (mc *memberController) Get() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		member := c.Locals("member").(*member.Member)
+
+		data := memberResponseData{
+			DeviceToken: member.DeviceToken,
+			Name:        member.Name,
+			Keywords:    member.Keywords,
+		}
+		res := BaseResponse{
+			Code:    200,
+			Message: "Success",
+			Data:    data,
+		}
+
+		return c.Status(200).JSON(res)
 	}
 }

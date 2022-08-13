@@ -12,6 +12,7 @@ import (
 	"github.com/Nexters/myply/domain/tag"
 
 	"github.com/Nexters/myply/application/controller"
+	"github.com/Nexters/myply/application/middleware"
 	"github.com/Nexters/myply/application/router"
 
 	"github.com/Nexters/myply/infrastructure/clients"
@@ -35,6 +36,7 @@ func New() (*fiber.App, error) {
 		configs.Set,
 		clients.Set,
 		router.Set,
+		middleware.Set,
 		controller.Set,
 		memos.Set,
 		persistence.Set,
@@ -55,6 +57,7 @@ func New() (*fiber.App, error) {
 // @BasePath /
 func NewServer(
 	config *configs.Config,
+	authMiddleware middleware.AuthMiddleware,
 	memberRouter router.MemberRouter,
 	memoRouter router.MemoRouter,
 	musicsRouter router.MusicsRouter,
@@ -78,6 +81,7 @@ func NewServer(
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
+	v1.Use(authMiddleware.New())
 	memberRouter.Init(&v1)
 	memoRouter.Init(&v1)
 	musicsRouter.Init(&v1)

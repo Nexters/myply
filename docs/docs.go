@@ -25,6 +25,33 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/members/": {
+            "get": {
+                "description": "get myply member defail information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "members"
+                ],
+                "summary": "Get user info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.MemberResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unautorized"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
             "post": {
                 "description": "join myply members",
                 "consumes": [
@@ -167,6 +194,20 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.MemberResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/controller.memberResponseData"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "controller.MusicResponse": {
             "type": "object",
             "properties": {
@@ -215,6 +256,23 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "controller.memberResponseData": {
+            "type": "object",
+            "properties": {
+                "deviceToken": {
+                    "type": "string"
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
