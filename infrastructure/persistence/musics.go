@@ -44,14 +44,14 @@ func (m *MusicRepository) buildMusicListResponse(items []*v3.SearchResult) (*mus
 	return &musicListResponse, nil
 }
 
-func (m *MusicRepository) GetMusicList(q string) (musicListResponse *musics.Musics, isCached bool, err error) {
-	data, _ := m.cc.Get(q)
+func (m *MusicRepository) GetMusicList(q, pageToken string) (musicListResponse *musics.MusicListDto, isCached bool, err error) {
+	redisKey := musics.GenerateRedisKey(q, pageToken)
+	data, _ := m.cc.Get(redisKey)
 	if data != nil {
-		if err = json.Unmarshal(data, musicListResponse); err == nil {
+		if err = json.Unmarshal(data, &musicListResponse); err == nil {
+			fmt.Printf("CACHE HIT of %s\n", redisKey)
 			return musicListResponse, true, nil
 		}
-
-		fmt.Println(err.Error())
 	}
 
 	var musicsV3 *v3.SearchListResponse
