@@ -38,6 +38,10 @@ func (mr *memberRepository) Get(deviceToken string) (*member.Member, error) {
 
 	var result memberData
 	if err := collection.FindOne(ctx, bson.D{{Key: "_id", Value: deviceToken}}).Decode(&result); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 

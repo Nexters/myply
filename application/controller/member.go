@@ -14,7 +14,7 @@ type MemberController interface {
 }
 
 type signUpDTO struct {
-	DeviceToken string   `json:"deviceToken"`
+	DeviceToken *string  `json:"deviceToken"`
 	Name        string   `json:"name"`
 	Keywords    []string `json:"keywords"`
 }
@@ -45,11 +45,12 @@ func NewMemberController(ms member.MemberService) MemberController {
 
 // @Summary Sign up
 // @Description 회원가입
+// @Description - deviceToken 필드를 넣어주지 않으면 자동으로 생성된다. 만약 필드가 있다면 해당 값으로 생성한다.
 // @Tags members
 // @Accept json
 // @Produce json
-// @Param body body signUpDTO true "sign up body"
-// @Success 200 {object} BaseResponse
+// @Param body body signUpDTO true "body"
+// @Success 200 {object} MemberResponse
 // @Failure 409 "Account already exist"
 // @Failure 500 "Internal server error"
 // @Router /members/ [post]
@@ -61,7 +62,7 @@ func (mc *memberController) SignUp() fiber.Handler {
 			return err
 		}
 
-		signUpErr := mc.service.SignUp(
+		member, signUpErr := mc.service.SignUp(
 			dto.DeviceToken,
 			dto.Name,
 			dto.Keywords,
@@ -86,7 +87,11 @@ func (mc *memberController) SignUp() fiber.Handler {
 		return c.Status(201).JSON(BaseResponse{
 			Code:    201,
 			Message: "success: sign up",
-			Data:    nil,
+			Data: memberResponseData{
+				DeviceToken: member.DeviceToken,
+				Name:        member.Name,
+				Keywords:    member.Keywords,
+			},
 		})
 	}
 }
@@ -128,7 +133,7 @@ func (mc *memberController) Get() fiber.Handler {
 // @Tags members
 // @Accept json
 // @Produce json
-// @Param body body updateDTO true "update body"
+// @Param body body updateDTO true "body"
 // @Success 200 {object} BaseResponse
 // @Failure 500 "Internal server error"
 // @Router /members/ [patch]

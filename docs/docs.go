@@ -58,7 +58,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "회원가입",
+                "description": "회원가입\n- deviceToken 필드를 넣어주지 않으면 자동으로 생성된다. 만약 필드가 있다면 해당 값으로 생성한다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -84,7 +84,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controller.BaseResponse"
+                            "$ref": "#/definitions/controller.MemberResponse"
                         }
                     },
                     "409": {

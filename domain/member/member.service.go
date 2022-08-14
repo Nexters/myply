@@ -1,13 +1,16 @@
 package member
 
 import (
+	"strings"
+
+	"github.com/google/uuid"
 	"github.com/google/wire"
 )
 
 var Set = wire.NewSet(NewMemberService)
 
 type MemberService interface {
-	SignUp(deviceToken string, name string, keywords []string) error
+	SignUp(deviceToken *string, name string, keywords []string) (*Member, error)
 	Update(
 		deviceToken string,
 		name *string,
@@ -23,10 +26,27 @@ func NewMemberService(repo MemberRepository) MemberService {
 	return &memberService{repo: repo}
 }
 
-func (ms *memberService) SignUp(deviceToken string, name string, keywords []string) error {
-	entity := Member{DeviceToken: deviceToken, Name: name, Keywords: keywords}
+func (ms *memberService) SignUp(deviceToken *string, name string, keywords []string) (*Member, error) {
+	var token string
+	if deviceToken == nil {
+		token = strings.ReplaceAll(uuid.New().String(), "-", "")
+		exist, err := ms.repo.Get(token)
+		if err != nil {
+			return nil, err
+		}
+		if exist != nil {
+			return ms.SignUp(deviceToken, name, keywords)
+		}
+	} else {
+		token = *deviceToken
+	}
 
-	return ms.repo.Create(entity)
+	entity := Member{DeviceToken: token, Name: name, Keywords: keywords}
+	if err := ms.repo.Create(entity); err != nil {
+		return nil, err
+	}
+
+	return &entity, nil
 }
 
 func (ms *memberService) Update(

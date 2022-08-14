@@ -25,7 +25,7 @@ func (a *authMiddleware) New() fiber.Handler {
 
 		deviceToken := c.Get("Device-Token")
 		member, err := a.memberRepository.Get(deviceToken)
-		if err != nil {
+		if err != nil || member == nil {
 			return c.Status(401).JSON(controller.BaseResponse{
 				Code:    401,
 				Message: "Unauthorized",
