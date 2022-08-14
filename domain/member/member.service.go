@@ -8,6 +8,11 @@ var Set = wire.NewSet(NewMemberService)
 
 type MemberService interface {
 	SignUp(deviceToken string, name string, keywords []string) error
+	Update(
+		deviceToken string,
+		name *string,
+		keywords []string,
+	) error
 }
 
 type memberService struct {
@@ -22,4 +27,12 @@ func (ms *memberService) SignUp(deviceToken string, name string, keywords []stri
 	entity := Member{DeviceToken: deviceToken, Name: name, Keywords: keywords}
 
 	return ms.repo.Create(entity)
+}
+
+func (ms *memberService) Update(
+	deviceToken string,
+	name *string,
+	keywords []string,
+) error {
+	return ms.repo.Update(deviceToken, name, keywords)
 }

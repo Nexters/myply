@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/Nexters/myply/application/controller"
@@ -43,7 +42,6 @@ func (a *authMiddleware) New() fiber.Handler {
 func (a *authMiddleware) isTarget(method, path string) bool {
 	targets := a.WhiteList
 	target := strings.ToUpper(method) + " " + path
-	fmt.Println(target)
 
 	for i := range targets {
 		if targets[i] == target {

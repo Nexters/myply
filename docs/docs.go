@@ -31,7 +31,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "get myply member defail information",
+                "description": "내 상세정보를 얻는다.\n- Device-Token 헤더값이 필요하다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -58,7 +58,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "join myply members",
+                "description": "회원가입",
                 "consumes": [
                     "application/json"
                 ],
@@ -89,6 +89,41 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Account already exist"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "patch": {
+                "description": "내 정보를 업데이트 한다.\n- Device-Token 헤더값이 필요하다.\n- 이름만 업데이트 할경우 \"name\" 필드만, 키워드만 업데이트 할 경우 \"keywords\" 필드만 넘겨주면 된다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "members"
+                ],
+                "summary": "Update name or keywords",
+                "parameters": [
+                    {
+                        "description": "update body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.updateDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.BaseResponse"
+                        }
                     },
                     "500": {
                         "description": "Internal server error"
@@ -335,6 +370,20 @@ const docTemplate = `{
                 "deviceToken": {
                     "type": "string"
                 },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.updateDTO": {
+            "type": "object",
+            "properties": {
                 "keywords": {
                     "type": "array",
                     "items": {

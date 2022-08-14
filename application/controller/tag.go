@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/Nexters/myply/domain/tag"
 	"github.com/gofiber/fiber/v2"
 )
@@ -42,8 +40,6 @@ func (tc *tagController) Recommend() fiber.Handler {
 		tags, err := tc.service.Recommend()
 
 		if err != nil {
-			fmt.Println(err.Error())
-
 			return c.Status(500).JSON(BaseResponse{
 				Code:    500,
 				Message: "fail: internal server error",

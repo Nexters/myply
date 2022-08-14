@@ -22,5 +22,6 @@ func (mr *memberRouter) Init(root *fiber.Router) {
 	{
 		memberRouter.Get("/", mr.controller.Get())
 		memberRouter.Post("/", mr.controller.SignUp())
+		memberRouter.Patch("/", mr.controller.Update())
 	}
 }

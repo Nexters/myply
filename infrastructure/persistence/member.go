@@ -73,3 +73,31 @@ func (mr *memberRepository) Create(entity member.Member) error {
 		return findErr
 	}
 }
+
+func (mr *memberRepository) Update(
+	deviceToken string,
+	name *string,
+	keywords []string,
+) error {
+	if name == nil && keywords == nil {
+		return errors.New("invalid args")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), mr.config.MongoTTL)
+	defer cancel()
+
+	collection := mr.mongo.Db.Collection(memberCollectionName)
+	filter := bson.D{{Key: "_id", Value: deviceToken}}
+	updateSet := bson.D{}
+	if name != nil {
+		updateSet = append(updateSet, bson.E{Key: "name", Value: name})
+	}
+	if keywords != nil {
+		updateSet = append(updateSet, bson.E{Key: "keywords", Value: keywords})
+	}
+	update := bson.D{{Key: "$set", Value: updateSet}}
+
+	_, err := collection.UpdateOne(ctx, filter, update)
+
+	return err
+}

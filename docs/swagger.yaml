@@ -83,6 +83,15 @@ definitions:
       name:
         type: string
     type: object
+  controller.updateDTO:
+    properties:
+      keywords:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -100,7 +109,9 @@ paths:
     get:
       consumes:
       - application/json
-      description: get myply member defail information
+      description: |-
+        내 상세정보를 얻는다.
+        - Device-Token 헤더값이 필요하다.
       produces:
       - application/json
       responses:
@@ -117,10 +128,36 @@ paths:
       summary: Get user info
       tags:
       - members
+    patch:
+      consumes:
+      - application/json
+      description: |-
+        내 정보를 업데이트 한다.
+        - Device-Token 헤더값이 필요하다.
+        - 이름만 업데이트 할경우 "name" 필드만, 키워드만 업데이트 할 경우 "keywords" 필드만 넘겨주면 된다.
+      parameters:
+      - description: update body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.updateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.BaseResponse'
+        "500":
+          description: Internal server error
+      summary: Update name or keywords
+      tags:
+      - members
     post:
       consumes:
       - application/json
-      description: join myply members
+      description: 회원가입
       parameters:
       - description: sign up body
         in: body
