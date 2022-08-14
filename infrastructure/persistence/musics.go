@@ -46,11 +46,11 @@ func (m *MusicRepository) buildMusicListResponse(items []*v3.SearchResult, nextP
 }
 
 func (m *MusicRepository) GetMusicList(q, pageToken string) (musicListResponse *musics.MusicListDto, isCached bool, err error) {
-	redisKey := musics.GenerateRedisKey(q, pageToken)
-	data, _ := m.cc.Get(redisKey)
+	cacheKey := musics.GenerateCacheKey(q, pageToken)
+	data, _ := m.cc.Get(cacheKey)
 	if data != nil {
 		if err = json.Unmarshal(data, &musicListResponse); err == nil {
-			fmt.Printf("CACHE HIT of %s\n", redisKey)
+			fmt.Printf("CACHE HIT of %s\n", cacheKey)
 			return musicListResponse, true, nil
 		}
 	}

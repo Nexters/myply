@@ -63,7 +63,7 @@ func (ms *musicService) GetMusicList(rawQueries []string, pageToken string) (*Mu
 			return nil, err
 		}
 
-		err = ms.musicRepository.SaveMusicList(GenerateRedisKey(queries, pageToken), musicsBytes)
+		err = ms.musicRepository.SaveMusicList(GenerateCacheKey(query, pageToken), musicsBytes)
 		if err != nil {
 			return nil, err
 		}
