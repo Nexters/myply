@@ -8,6 +8,6 @@ import (
 
 var Set = wire.NewSet(NewMusicService)
 
-func GenerateRedisKey(query, token string) string {
+func GenerateCacheKey(query, token string) string {
 	return fmt.Sprintf("%s:%s", query, token)
 }

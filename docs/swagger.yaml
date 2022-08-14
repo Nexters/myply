@@ -226,10 +226,8 @@ paths:
         name: nextToken
         type: string
       - in: query
-        items:
-          type: string
         name: q
-        type: array
+        type: string
       produces:
       - application/json
       responses:

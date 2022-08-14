@@ -204,10 +204,7 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
+                        "type": "string",
                         "name": "q",
                         "in": "query"
                     }

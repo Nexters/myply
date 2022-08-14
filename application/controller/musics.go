@@ -41,8 +41,8 @@ func (o Order) convert() (musics.Order, error) {
 }
 
 type SearchQueryParams struct {
-	Q         []string `query:"q"`
-	NextToken string   `query:"nextToken"`
+	Q         string `query:"q"`
+	NextToken string `query:"nextToken"`
 }
 
 type RetrieveQueryParams struct {

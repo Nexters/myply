@@ -2,7 +2,6 @@ package musics
 
 import (
 	"encoding/json"
-	"strings"
 
 	"go.uber.org/zap"
 )
@@ -27,7 +26,7 @@ func (o Order) String() string {
 }
 
 type Service interface {
-	GetMusicList(rawQueries []string, pageToken string) (*MusicListDto, error)
+	GetMusicList(query string, pageToken string) (*MusicListDto, error)
 	GetPlayListBy(order Order, pageToken string) (*MusicListDto, error)
 }
 
@@ -49,10 +48,8 @@ func (ms *musicService) GetPlayListBy(order Order, pageToken string) (*MusicList
 	return ms.musicRepository.GetPlayListBy(order.String(), pageToken)
 }
 
-func (ms *musicService) GetMusicList(rawQueries []string, pageToken string) (*MusicListDto, error) {
-	// TODO: parse korean sentence to []noun
-	queries := strings.Join(rawQueries, ",")
-	musics, isCached, err := ms.musicRepository.GetMusicList(queries, pageToken)
+func (ms *musicService) GetMusicList(query string, pageToken string) (*MusicListDto, error) {
+	musics, isCached, err := ms.musicRepository.GetMusicList(query, pageToken)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +60,7 @@ func (ms *musicService) GetMusicList(rawQueries []string, pageToken string) (*Mu
 			return nil, err
 		}
 
-		err = ms.musicRepository.SaveMusicList(GenerateRedisKey(queries, pageToken), musicsBytes)
+		err = ms.musicRepository.SaveMusicList(GenerateCacheKey(query, pageToken), musicsBytes)
 		if err != nil {
 			return nil, err
 		}
