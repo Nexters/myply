@@ -137,6 +137,7 @@ func (mc *memberController) Get() fiber.Handler {
 // @Success 200 {object} BaseResponse
 // @Failure 500 "Internal server error"
 // @Router /members/ [patch]
+// @Security ApiKeyAuth
 func (mc *memberController) Update() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		dto := new(updateDTO)
@@ -147,14 +148,19 @@ func (mc *memberController) Update() fiber.Handler {
 		member := c.Locals("member").(*member.Member)
 		deviceToken := member.DeviceToken
 
-		if err := mc.service.Update(deviceToken, dto.Name, dto.Keywords); err != nil {
+		member, err := mc.service.Update(deviceToken, dto.Name, dto.Keywords)
+		if err != nil {
 			return err
 		}
 
 		return c.Status(200).JSON(BaseResponse{
 			Code:    200,
 			Message: "Success",
-			Data:    nil,
+			Data: memberResponseData{
+				DeviceToken: member.DeviceToken,
+				Name:        member.Name,
+				Keywords:    member.Keywords,
+			},
 		})
 	}
 }

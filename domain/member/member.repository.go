@@ -7,5 +7,5 @@ type MemberRepository interface {
 		deviceToken string,
 		name *string,
 		keywords []string,
-	) error
+	) (*Member, error)
 }

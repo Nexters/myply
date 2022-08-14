@@ -136,7 +136,7 @@ paths:
         - Device-Token 헤더값이 필요하다.
         - 이름만 업데이트 할경우 "name" 필드만, 키워드만 업데이트 할 경우 "keywords" 필드만 넘겨주면 된다.
       parameters:
-      - description: update body
+      - description: body
         in: body
         name: body
         required: true
@@ -151,6 +151,8 @@ paths:
             $ref: '#/definitions/controller.BaseResponse'
         "500":
           description: Internal server error
+      security:
+      - ApiKeyAuth: []
       summary: Update name or keywords
       tags:
       - members
@@ -161,7 +163,7 @@ paths:
         회원가입
         - deviceToken 필드를 넣어주지 않으면 자동으로 생성된다. 만약 필드가 있다면 해당 값으로 생성한다.
       parameters:
-      - description: sign up body
+      - description: body
         in: body
         name: body
         required: true

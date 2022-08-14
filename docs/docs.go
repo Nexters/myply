@@ -71,7 +71,7 @@ const docTemplate = `{
                 "summary": "Sign up",
                 "parameters": [
                     {
-                        "description": "sign up body",
+                        "description": "body",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -96,6 +96,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "내 정보를 업데이트 한다.\n- Device-Token 헤더값이 필요하다.\n- 이름만 업데이트 할경우 \"name\" 필드만, 키워드만 업데이트 할 경우 \"keywords\" 필드만 넘겨주면 된다.",
                 "consumes": [
                     "application/json"
@@ -109,7 +114,7 @@ const docTemplate = `{
                 "summary": "Update name or keywords",
                 "parameters": [
                     {
-                        "description": "update body",
+                        "description": "body",
                         "name": "body",
                         "in": "body",
                         "required": true,

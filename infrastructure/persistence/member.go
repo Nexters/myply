@@ -9,6 +9,7 @@ import (
 	"github.com/Nexters/myply/infrastructure/persistence/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type memberData struct {
@@ -82,9 +83,9 @@ func (mr *memberRepository) Update(
 	deviceToken string,
 	name *string,
 	keywords []string,
-) error {
+) (*member.Member, error) {
 	if name == nil && keywords == nil {
-		return errors.New("invalid args")
+		return nil, errors.New("invalid args")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), mr.config.MongoTTL)
@@ -100,8 +101,13 @@ func (mr *memberRepository) Update(
 		updateSet = append(updateSet, bson.E{Key: "keywords", Value: keywords})
 	}
 	update := bson.D{{Key: "$set", Value: updateSet}}
+	opt := options.UpdateOptions{}
+	opt.SetUpsert(false)
 
-	_, err := collection.UpdateOne(ctx, filter, update)
+	_, err := collection.UpdateOne(ctx, filter, update, &opt)
+	if err != nil {
+		return nil, err
+	}
 
-	return err
+	return mr.Get(deviceToken)
 }

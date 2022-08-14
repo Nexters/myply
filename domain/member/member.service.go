@@ -15,7 +15,7 @@ type MemberService interface {
 		deviceToken string,
 		name *string,
 		keywords []string,
-	) error
+	) (*Member, error)
 }
 
 type memberService struct {
@@ -53,6 +53,6 @@ func (ms *memberService) Update(
 	deviceToken string,
 	name *string,
 	keywords []string,
-) error {
+) (*Member, error) {
 	return ms.repo.Update(deviceToken, name, keywords)
 }
