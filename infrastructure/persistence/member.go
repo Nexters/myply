@@ -24,7 +24,7 @@ type memberRepository struct {
 }
 
 const (
-	memberCollectionName = "membmers"
+	memberCollectionName = "members"
 )
 
 func NewMemberRepository(mongo *db.MongoInstance, config *configs.Config) member.MemberRepository {

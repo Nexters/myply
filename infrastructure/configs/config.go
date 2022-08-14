@@ -79,7 +79,7 @@ func NewConfig() (*Config, error) {
 		MongoURI:              os.Getenv("MONGO_URI"),
 		MongoDBName:           os.Getenv("MONGO_DB_NAME"),
 		MongoTTL:              time.Duration(mongoTTL) * time.Second,
-		MongoCacheTTL:         time.Duration(24*1) * time.Hour, // 1day
+		MongoCacheTTL:         time.Duration(24) * time.Hour, // 1day
 		YoutubeAPIKey:         os.Getenv("YOUTUBE_API_KEY"),
 		StorageCollectionName: os.Getenv("STORAGE_COLLECTION_NAME"),
 	}, nil

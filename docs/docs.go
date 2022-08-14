@@ -270,6 +270,20 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.ListMusicData": {
+            "type": "object",
+            "properties": {
+                "musics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.MusicResponse"
+                    }
+                },
+                "nextPageToken": {
+                    "type": "string"
+                }
+            }
+        },
         "controller.ListMusicResponse": {
             "type": "object",
             "properties": {
@@ -277,10 +291,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/controller.MusicResponse"
-                    }
+                    "$ref": "#/definitions/controller.ListMusicData"
                 },
                 "message": {
                     "type": "string"

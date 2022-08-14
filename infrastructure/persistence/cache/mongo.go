@@ -17,8 +17,6 @@ import (
 
 var Set = wire.NewSet(NewMongoCacheDB)
 
-const CacheTTL = 24 * 60 * 60
-
 // Storage interface that is implemented by storage providers
 type Storage struct {
 	db    *mongo.Database
@@ -55,12 +53,10 @@ func NewMongoCacheDB(mongoInstance *db.MongoInstance, config *configs.Config) (C
 		// setting to 0
 		// means that documents will remain in the collection
 		// until they're explicitly deleted or the collection is dropped.
-		Options: options.Index().SetExpireAfterSeconds(CacheTTL),
+		Options: options.Index().SetExpireAfterSeconds(0),
 	}
 
-	if _, err := col.Indexes().CreateOne(context.Background(), indexModel); err != nil {
-		return nil, err
-	}
+	col.Indexes().CreateOne(context.Background(), indexModel) // ignore error
 
 	return &Storage{
 		db:  db,

@@ -1,4 +1,4 @@
-.PHONY: run build clean wire
+.PHONY: test run build clean wire
 
 APP_NAME = apiserver
 GO ?= GO111MODULE=on go
@@ -10,6 +10,9 @@ MIGRATION_DIR = $(PWD)/infrastructure/migrations
 setup:
 	go mod tidy
 	go install github.com/google/wire/cmd/wire@latest
+
+test:
+	go test ./...
 
 # remove binary		
 clean:

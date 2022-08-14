@@ -9,7 +9,7 @@ import (
 )
 
 type MusicController interface {
-	Search() fiber.Handler // TODO: pagination
+	Search() fiber.Handler
 	Retrieve() fiber.Handler
 }
 
@@ -42,12 +42,12 @@ func (o Order) convert() (musics.Order, error) {
 
 type SearchQueryParams struct {
 	Q         []string `query:"q"`
-	NextToken string   `query:"token"`
+	NextToken string   `query:"nextToken"`
 }
 
 type RetrieveQueryParams struct {
 	Order     Order  `query:"order"`
-	NextToken string `query:"token"`
+	NextToken string `query:"nextToken"`
 }
 
 type MusicResponse struct {
@@ -59,9 +59,14 @@ type MusicResponse struct {
 	IsMemoed       bool     `json:"isMemoed"`
 }
 
+type ListMusicData struct {
+	Musics        []MusicResponse `json:"musics"`
+	NextPageToken string          `json:"nextPageToken,omitempty"`
+}
+
 type ListMusicResponse struct {
 	BaseResponse
-	Data []MusicResponse `json:"data"`
+	Data ListMusicData `json:"data"`
 }
 
 // @Summary      Search music playlist
@@ -78,8 +83,8 @@ func (mc *musicController) Search() fiber.Handler {
 
 	return func(ctx *fiber.Ctx) error {
 		var (
-			musics *musics.Musics
-			err    error
+			musicListDto *musics.MusicListDto
+			err          error
 		)
 		p := new(SearchQueryParams)
 		err = ctx.QueryParser(p)
@@ -87,14 +92,14 @@ func (mc *musicController) Search() fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 
-		musics, err = mc.musicService.GetMusicList(p.Q)
+		musicListDto, err = mc.musicService.GetMusicList(p.Q, p.NextToken)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
-		data := []MusicResponse{}
-		for _, m := range *musics {
-			data = append(data, MusicResponse{
+		musicList := []MusicResponse{}
+		for _, m := range *musicListDto.Musics {
+			musicList = append(musicList, MusicResponse{
 				YoutubeVideoID: m.YoutubeVideoID,
 				ThumbnailURL:   m.ThumbnailURL,
 				Title:          m.Title,
@@ -105,7 +110,10 @@ func (mc *musicController) Search() fiber.Handler {
 		}
 		return ctx.Status(200).JSON(BaseResponse{
 			Code: Ok,
-			Data: data,
+			Data: ListMusicData{
+				Musics:        musicList,
+				NextPageToken: musicListDto.NextPageToken,
+			},
 		})
 	}
 }
@@ -133,14 +141,14 @@ func (mc *musicController) Retrieve() fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 
-		playList, err := mc.musicService.GetPlayListBy(order)
+		musicListDto, err := mc.musicService.GetPlayListBy(order, p.NextToken)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
-		var data []MusicResponse
-		for _, m := range *playList {
-			data = append(data, MusicResponse{
+		var musicList []MusicResponse
+		for _, m := range *musicListDto.Musics {
+			musicList = append(musicList, MusicResponse{
 				YoutubeVideoID: m.YoutubeVideoID,
 				ThumbnailURL:   m.ThumbnailURL,
 				Title:          m.Title,
@@ -151,7 +159,10 @@ func (mc *musicController) Retrieve() fiber.Handler {
 		}
 		return ctx.Status(200).JSON(BaseResponse{
 			Code: Ok,
-			Data: data,
+			Data: ListMusicData{
+				Musics:        musicList,
+				NextPageToken: musicListDto.NextPageToken,
+			},
 		})
 	}
 }
