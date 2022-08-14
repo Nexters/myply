@@ -27,8 +27,13 @@ func (o Order) String() string {
 }
 
 type Service interface {
-	GetMusicList(rawQueries []string) (*Musics, error) // TODO: pagination
-	GetPlayListBy(order Order) (*Musics, error)
+	GetMusicList(rawQueries []string, pageToken string) (*MusicListDto, error)
+	GetPlayListBy(order Order, pageToken string) (*MusicListDto, error)
+}
+
+type MusicListDto struct {
+	Musics        *Musics
+	NextPageToken string // optional
 }
 
 type musicService struct {
@@ -40,15 +45,14 @@ func NewMusicService(l *zap.SugaredLogger, mr MusicRepository) Service {
 	return &musicService{logger: l, musicRepository: mr}
 }
 
-func (ms *musicService) GetPlayListBy(order Order) (*Musics, error) {
-	return ms.musicRepository.GetPlayListBy(order.String())
+func (ms *musicService) GetPlayListBy(order Order, pageToken string) (*MusicListDto, error) {
+	return ms.musicRepository.GetPlayListBy(order.String(), pageToken)
 }
 
-// MongoCacheTTL
-func (ms *musicService) GetMusicList(rawQueries []string) (*Musics, error) {
+func (ms *musicService) GetMusicList(rawQueries []string, pageToken string) (*MusicListDto, error) {
 	// TODO: parse korean sentence to []noun
 	queries := strings.Join(rawQueries, ",")
-	musics, isCached, err := ms.musicRepository.GetMusicList(queries)
+	musics, isCached, err := ms.musicRepository.GetMusicList(queries, pageToken)
 	if err != nil {
 		return nil, err
 	}
@@ -58,12 +62,12 @@ func (ms *musicService) GetMusicList(rawQueries []string) (*Musics, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = ms.musicRepository.SaveMusicList(queries, musicsBytes)
+
+		err = ms.musicRepository.SaveMusicList(GenerateRedisKey(queries, pageToken), musicsBytes)
 		if err != nil {
 			return nil, err
 		}
 		return musics, nil
 	}
-	ms.logger.Infof("\n[Cache hit]\n- key: %s\n- len of musics: %d\n", queries, len(*musics))
 	return musics, nil
 }

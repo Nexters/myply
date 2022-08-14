@@ -2,6 +2,7 @@ package clients
 
 import (
 	"context"
+
 	"github.com/Nexters/myply/infrastructure/configs"
 	"google.golang.org/api/option"
 	v3 "google.golang.org/api/youtube/v3"
@@ -27,7 +28,7 @@ const (
 type TagMap map[string][]string
 
 type YoutubeClient interface {
-	SearchPlaylist(q string, order string) (*v3.SearchListResponse, error)
+	SearchPlaylist(q string, order string, pageToken string) (*v3.SearchListResponse, error)
 	ParseVideoIds(items []*v3.SearchResult) []string
 	ParseVideoTags(ids []string) (TagMap, error)
 }
@@ -37,7 +38,7 @@ type youtubeClient struct {
 }
 
 func NewYoutubeClient(config *configs.Config) (YoutubeClient, error) {
-	// TODO: if needed use option.WithGRPCConnectionPool()
+	// if needed use option.WithGRPCConnectionPool()
 	service, err := v3.NewService(
 		context.Background(),
 		option.WithAPIKey(config.YoutubeAPIKey),
@@ -49,7 +50,7 @@ func NewYoutubeClient(config *configs.Config) (YoutubeClient, error) {
 	return &youtubeClient{service}, nil
 }
 
-func (yc *youtubeClient) SearchPlaylist(q string, order string) (*v3.SearchListResponse, error) {
+func (yc *youtubeClient) SearchPlaylist(q, order, pageToken string) (*v3.SearchListResponse, error) {
 	if order == "" {
 		order = defaultOrder
 	}
@@ -58,6 +59,7 @@ func (yc *youtubeClient) SearchPlaylist(q string, order string) (*v3.SearchListR
 		Q(q).
 		Type(targetTypes...).
 		RegionCode(regionCode).
+		PageToken(pageToken). // When pageToken == "", token will be ignored.
 		VideoCategoryId(videoCategory).
 		VideoDuration(videoDuration).
 		Order(order).

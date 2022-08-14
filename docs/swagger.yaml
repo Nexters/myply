@@ -8,14 +8,21 @@ definitions:
       message:
         type: string
     type: object
+  controller.ListMusicData:
+    properties:
+      musics:
+        items:
+          $ref: '#/definitions/controller.MusicResponse'
+        type: array
+      nextPageToken:
+        type: string
+    type: object
   controller.ListMusicResponse:
     properties:
       code:
         type: integer
       data:
-        items:
-          $ref: '#/definitions/controller.MusicResponse'
-        type: array
+        $ref: '#/definitions/controller.ListMusicData'
       message:
         type: string
     type: object

@@ -1,5 +1,13 @@
 package musics
 
-import "github.com/google/wire"
+import (
+	"fmt"
+
+	"github.com/google/wire"
+)
 
 var Set = wire.NewSet(NewMusicService)
+
+func GenerateRedisKey(query, token string) string {
+	return fmt.Sprintf("%s:%s", query, token)
+}

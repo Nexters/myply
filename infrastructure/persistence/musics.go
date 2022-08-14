@@ -22,7 +22,7 @@ func NewMusicRepository(c *configs.Config, cc cache.Cache, yc clients.YoutubeCli
 
 }
 
-func (m *MusicRepository) buildMusicListResponse(items []*v3.SearchResult) (*musics.Musics, error) {
+func (m *MusicRepository) buildMusicListResponse(items []*v3.SearchResult, nextPageToken string) (*musics.MusicListDto, error) {
 	ids := m.yc.ParseVideoIds(items)
 	musicListResponse := make(musics.Musics, len(items))
 	tags, err := m.yc.ParseVideoTags(ids)
@@ -41,7 +41,8 @@ func (m *MusicRepository) buildMusicListResponse(items []*v3.SearchResult) (*mus
 			)
 		}
 	}
-	return &musicListResponse, nil
+	return &musics.MusicListDto{
+		Musics: &musicListResponse, NextPageToken: nextPageToken}, nil
 }
 
 func (m *MusicRepository) GetMusicList(q, pageToken string) (musicListResponse *musics.MusicListDto, isCached bool, err error) {
@@ -55,12 +56,12 @@ func (m *MusicRepository) GetMusicList(q, pageToken string) (musicListResponse *
 	}
 
 	var musicsV3 *v3.SearchListResponse
-	musicsV3, err = m.yc.SearchPlaylist(fmt.Sprintf("playlist,%s", q), "")
+	musicsV3, err = m.yc.SearchPlaylist(fmt.Sprintf("playlist,%s", q), "", pageToken)
 	if err != nil {
 		return nil, false, err
 	}
 
-	if musicListResponse, err = m.buildMusicListResponse(musicsV3.Items); err != nil {
+	if musicListResponse, err = m.buildMusicListResponse(musicsV3.Items, musicsV3.NextPageToken); err != nil {
 		return nil, false, err
 	}
 
@@ -71,14 +72,14 @@ func (m *MusicRepository) SaveMusicList(key string, musicList []byte) error {
 	return m.cc.Set(key, musicList, m.c.MongoCacheTTL)
 }
 
-func (m *MusicRepository) GetPlayListBy(order string) (musicListResponse *musics.Musics, err error) {
+func (m *MusicRepository) GetPlayListBy(order, pageToken string) (musicListResponse *musics.MusicListDto, err error) {
 	var musicsV3 *v3.SearchListResponse
-	musicsV3, err = m.yc.SearchPlaylist("", order)
+	musicsV3, err = m.yc.SearchPlaylist("", order, pageToken)
 	if err != nil {
 		return nil, err
 	}
 
-	if musicListResponse, err = m.buildMusicListResponse(musicsV3.Items); err != nil {
+	if musicListResponse, err = m.buildMusicListResponse(musicsV3.Items, musicsV3.NextPageToken); err != nil {
 		return nil, err
 	}
 
