@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  controller.AddRequest:
+    properties:
+      body:
+        type: string
+      youtubeVideoId:
+        type: string
+    type: object
   controller.BaseResponse:
     properties:
       code:
@@ -35,6 +42,21 @@ definitions:
       message:
         type: string
     type: object
+  controller.MemoResponse:
+    properties:
+      body:
+        type: string
+      keywords:
+        items:
+          type: string
+        type: array
+      memoID:
+        type: string
+      thumbnailURL:
+        type: string
+      title:
+        type: string
+    type: object
   controller.MusicResponse:
     properties:
       isMemoed:
@@ -50,6 +72,11 @@ definitions:
           type: string
         type: array
       youtubeVideoID:
+        type: string
+    type: object
+  controller.PatchRequest:
+    properties:
+      body:
         type: string
     type: object
   controller.RecommendResponse:
@@ -190,6 +217,78 @@ paths:
       summary: Sign up
       tags:
       - members
+  /memos/:
+    patch:
+      consumes:
+      - application/json
+      description: 메모 수정
+      parameters:
+      - description: memo request body
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.PatchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.MemoResponse'
+        "500":
+          description: Internal Server Error
+      summary: Update Memo
+      tags:
+      - memos
+    post:
+      consumes:
+      - application/json
+      description: 메모 생성
+      parameters:
+      - description: memo request body
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.AddRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.MemoResponse'
+        "500":
+          description: Internal Server Error
+      summary: Add Memo
+      tags:
+      - memos
+  /memos/{memoID}:
+    get:
+      consumes:
+      - application/json
+      description: 메모 조회
+      parameters:
+      - description: memoID to retrieve
+        in: path
+        name: memoID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.MemoResponse'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Retrieve Memo
+      tags:
+      - memos
   /musics:
     get:
       consumes:
@@ -210,7 +309,7 @@ paths:
           schema:
             $ref: '#/definitions/controller.ListMusicResponse'
         "500":
-          description: ""
+          description: Internal Server Error
       security:
       - ApiKeyAuth: []
       summary: Retrieve music playlist
@@ -236,7 +335,7 @@ paths:
           schema:
             $ref: '#/definitions/controller.ListMusicResponse'
         "500":
-          description: ""
+          description: Internal Server Error
       security:
       - ApiKeyAuth: []
       summary: Search music playlist
@@ -255,7 +354,7 @@ paths:
           schema:
             $ref: '#/definitions/controller.RecommendResponse'
         "500":
-          description: ""
+          description: Internal Server Error
       security:
       - ApiKeyAuth: []
       summary: Get recommended tags

@@ -4,10 +4,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/google/wire"
 )
-
-var Set = wire.NewSet(NewMemberService)
 
 type MemberService interface {
 	SignUp(deviceToken *string, name string, keywords []string) (*Member, error)

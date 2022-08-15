@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/Nexters/myply/domain/memos"
 	"github.com/Nexters/myply/infrastructure/persistence/db"
 	"go.mongodb.org/mongo-driver/bson"
@@ -62,7 +63,7 @@ func (r *MemoMongoRepository) GetMemo(id string) (*memos.Memo, error) {
 	if err = coll.FindOne(context.Background(), bson.M{"_id": objectId}).Decode(&md); err != nil {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
-			return nil, memos.NotFoundException
+			return nil, &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. id=%s", id)}
 		default:
 			return nil, err
 		}
@@ -78,7 +79,7 @@ func (r *MemoMongoRepository) GetMemoByVideoId(id string) (*memos.Memo, error) {
 	if err := coll.FindOne(context.Background(), bson.M{"youtubeVideoId": id}).Decode(&md); err != nil {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
-			return nil, memos.NotFoundException
+			return nil, &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. videoID=%s", id)}
 		default:
 			return nil, err
 		}
@@ -87,17 +88,27 @@ func (r *MemoMongoRepository) GetMemoByVideoId(id string) (*memos.Memo, error) {
 	return md.toEntity(), nil
 }
 
-func (r *MemoMongoRepository) SaveMemo(videoId string, body string, deviceToken string) (string, error) {
+func (r *MemoMongoRepository) AddMemo(deviceToken string, videoId string, body string, tagIds []string) (string, error) {
 	coll := r.getCollection()
 
 	memoId := primitive.NewObjectID()
 	now := r.now()
+
+	var objectTagIds []primitive.ObjectID
+	for _, id := range tagIds {
+		objectId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return "", err
+		}
+		objectTagIds = append(objectTagIds, objectId)
+	}
+
 	md := MemoData{
 		ID:             memoId,
 		DeviceToken:    deviceToken,
 		YoutubeVideoId: videoId,
 		Body:           body,
-		TagIds:         nil, // TODO: change to real data
+		TagIds:         objectTagIds, // TODO: change to real data
 		CreatedAt:      *now,
 		UpdatedAt:      *now,
 	}
@@ -108,6 +119,28 @@ func (r *MemoMongoRepository) SaveMemo(videoId string, body string, deviceToken 
 	}
 
 	return insertResult.InsertedID.(primitive.ObjectID).Hex(), nil
+}
+
+func (r *MemoMongoRepository) UpdateBody(id string, body string) error {
+	coll := r.getCollection()
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": objectId}
+	update := bson.D{{"$set", bson.D{{"body", body}}}}
+	if _, err = coll.UpdateOne(context.Background(), filter, update); err != nil {
+		switch {
+		case errors.Is(err, mongo.ErrNoDocuments):
+			return &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. id=%s", id)}
+		default:
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *MemoMongoRepository) getCollection() *mongo.Collection {

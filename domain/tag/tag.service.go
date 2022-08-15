@@ -1,9 +1,5 @@
 package tag
 
-import "github.com/google/wire"
-
-var Set = wire.NewSet(NewTagService)
-
 type TagService interface {
 	Recommend() (*Tags, error)
 }
