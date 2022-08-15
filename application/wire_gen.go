@@ -46,9 +46,6 @@ func New() (*fiber.App, error) {
 	memberController := controller.NewMemberController(memberService)
 	memberRouter := router.NewMemberRouter(memberController)
 	repository := persistence.NewMemoRepository(mongoInstance)
-	service := memos.NewMemoService(repository)
-	memoController := controller.NewMemoController(service)
-	memoRouter := router.NewMemoRouter(memoController)
 	sugaredLogger, err := logger.NewLogger(config)
 	if err != nil {
 		return nil, err
@@ -62,8 +59,11 @@ func New() (*fiber.App, error) {
 		return nil, err
 	}
 	musicRepository := persistence.NewMusicRepository(config, cacheCache, youtubeClient)
-	musicsService := musics.NewMusicService(sugaredLogger, musicRepository)
-	musicController := controller.NewMusicController(sugaredLogger, musicsService)
+	service := musics.NewMusicService(sugaredLogger, musicRepository)
+	memosService := memos.NewMemoService(repository, service)
+	memoController := controller.NewMemoController(memosService)
+	memoRouter := router.NewMemoRouter(memoController)
+	musicController := controller.NewMusicController(sugaredLogger, service)
 	musicsRouter := router.NewMusicsRouter(musicController)
 	tagRepository := persistence.NewTagRepository()
 	tagService := tag.NewTagService(tagRepository)

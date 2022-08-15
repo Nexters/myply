@@ -28,6 +28,7 @@ func (o Order) String() string {
 type Service interface {
 	GetMusicList(query string, pageToken string) (*MusicListDto, error)
 	GetPlayListBy(order Order, pageToken string) (*MusicListDto, error)
+	GetTags(videoId string) ([]string, error)
 }
 
 type MusicListDto struct {
@@ -67,4 +68,8 @@ func (ms *musicService) GetMusicList(query string, pageToken string) (*MusicList
 		return musics, nil
 	}
 	return musics, nil
+}
+
+func (ms *musicService) GetTags(videoId string) ([]string, error) {
+	return ms.musicRepository.GetTags(videoId)
 }

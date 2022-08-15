@@ -85,3 +85,11 @@ func (m *MusicRepository) GetPlayListBy(order, pageToken string) (musicListRespo
 
 	return musicListResponse, nil
 }
+
+func (m *MusicRepository) GetTags(videoId string) ([]string, error) {
+	tagMap, err := m.yc.ParseVideoTags([]string{videoId})
+	if err != nil {
+		return nil, err
+	}
+	return tagMap[videoId], nil
+}

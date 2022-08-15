@@ -2,6 +2,7 @@ package memos
 
 import (
 	"fmt"
+	"github.com/Nexters/myply/domain/musics"
 )
 
 type Service interface {
@@ -11,17 +12,18 @@ type Service interface {
 }
 
 type memoService struct {
-	repository *Repository
+	repository   Repository
+	musicService musics.Service
 }
 
-func NewMemoService(r *Repository) *Service {
+func NewMemoService(r Repository, musicService musics.Service) *Service {
 	var service Service
-	service = &memoService{r}
+	service = &memoService{r, musicService}
 	return &service
 }
 
 func (s *memoService) GetMemo(id string) (*Memo, error) {
-	m, err := (*s.repository).GetMemo(id)
+	m, err := s.repository.GetMemo(id)
 	if err != nil {
 		return nil, err
 	}
@@ -30,14 +32,18 @@ func (s *memoService) GetMemo(id string) (*Memo, error) {
 }
 
 func (s *memoService) AddMemo(videoId string, body string, deviceToken string) (memoId string, e error) {
-	memo, err := (*s.repository).GetMemoByVideoId(videoId)
+	memo, err := s.repository.GetMemoByVideoId(videoId)
 	if memo != nil {
 		return "", &AlreadyExistsError{Msg: fmt.Sprintf("memo with videoID already exists. videoID=%s", videoId)}
 	}
 
 	switch err.(type) {
 	case *NotFoundError:
-		return (*s.repository).AddMemo(deviceToken, videoId, body, nil)
+		tags, musicErr := s.musicService.GetTags(videoId)
+		if musicErr != nil {
+			return "", musicErr
+		}
+		return s.repository.AddMemo(deviceToken, videoId, body, tags)
 	default:
 		return "", err
 	}
@@ -53,7 +59,7 @@ func (s *memoService) UpdateBody(id string, body string, deviceToken string) (*M
 		return nil, &IllegalDeviceTokenError{Msg: fmt.Sprintf("failed to update due to invalid device token")}
 	}
 
-	if err = (*s.repository).UpdateBody(id, body); err != nil {
+	if err = s.repository.UpdateBody(id, body); err != nil {
 		return nil, err
 	}
 
