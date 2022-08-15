@@ -7,7 +7,7 @@ import (
 
 type Service interface {
 	GetMemo(id string) (*Memo, error)
-	AddMemo(videoId string, body string, deviceToken string) (memoId string, e error)
+	AddMemo(videoId string, body string, deviceToken string) (*Memo, error)
 	UpdateBody(id string, body string, deviceToken string) (*Memo, error)
 }
 
@@ -16,10 +16,8 @@ type memoService struct {
 	musicService musics.Service
 }
 
-func NewMemoService(r Repository, musicService musics.Service) *Service {
-	var service Service
-	service = &memoService{r, musicService}
-	return &service
+func NewMemoService(r Repository, musicService musics.Service) Service {
+	return &memoService{r, musicService}
 }
 
 func (s *memoService) GetMemo(id string) (*Memo, error) {
@@ -31,21 +29,27 @@ func (s *memoService) GetMemo(id string) (*Memo, error) {
 	return m, err
 }
 
-func (s *memoService) AddMemo(videoId string, body string, deviceToken string) (memoId string, e error) {
+func (s *memoService) AddMemo(videoId string, body string, deviceToken string) (*Memo, error) {
 	memo, err := s.repository.GetMemoByVideoId(videoId)
 	if memo != nil {
-		return "", &AlreadyExistsError{Msg: fmt.Sprintf("memo with videoID already exists. videoID=%s", videoId)}
+		return nil, &AlreadyExistsError{Msg: fmt.Sprintf("memo with videoID already exists. videoID=%s", videoId)}
 	}
 
 	switch err.(type) {
 	case *NotFoundError:
-		tags, musicErr := s.musicService.GetTags(videoId)
+		music, musicErr := s.musicService.GetMusic(videoId)
 		if musicErr != nil {
-			return "", musicErr
+			return nil, musicErr
 		}
-		return s.repository.AddMemo(deviceToken, videoId, body, tags)
+
+		id, insertErr := s.repository.AddMemo(deviceToken, videoId, body, music.YoutubeTags)
+		if insertErr != nil {
+			return nil, insertErr
+		}
+
+		return s.GetMemo(id)
 	default:
-		return "", err
+		return nil, err
 	}
 }
 

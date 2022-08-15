@@ -61,7 +61,7 @@ func New() (*fiber.App, error) {
 	musicRepository := persistence.NewMusicRepository(config, cacheCache, youtubeClient)
 	service := musics.NewMusicService(sugaredLogger, musicRepository)
 	memosService := memos.NewMemoService(repository, service)
-	memoController := controller.NewMemoController(memosService)
+	memoController := controller.NewMemoController(memosService, service)
 	memoRouter := router.NewMemoRouter(memoController)
 	musicController := controller.NewMusicController(sugaredLogger, service)
 	musicsRouter := router.NewMusicsRouter(musicController)

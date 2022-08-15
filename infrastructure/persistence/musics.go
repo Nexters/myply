@@ -45,6 +45,19 @@ func (m *MusicRepository) buildMusicListResponse(items []*v3.SearchResult, nextP
 		Musics: &musicListResponse, NextPageToken: nextPageToken}, nil
 }
 
+func (m *MusicRepository) GetMusic(videoId string) (*musics.Music, error) {
+	detail, err := m.yc.GetMusicDetail(videoId)
+	if err != nil {
+		return nil, err
+	}
+	return &musics.Music{
+		YoutubeVideoID: videoId,
+		ThumbnailURL:   detail.ThumbnailUrl,
+		Title:          detail.Title,
+		YoutubeTags:    detail.Tags,
+	}, nil
+}
+
 func (m *MusicRepository) GetMusicList(q, pageToken string) (musicListResponse *musics.MusicListDto, isCached bool, err error) {
 	cacheKey := musics.GenerateCacheKey(q, pageToken)
 	data, _ := m.cc.Get(cacheKey)
@@ -84,12 +97,4 @@ func (m *MusicRepository) GetPlayListBy(order, pageToken string) (musicListRespo
 	}
 
 	return musicListResponse, nil
-}
-
-func (m *MusicRepository) GetTags(videoId string) ([]string, error) {
-	tagMap, err := m.yc.ParseVideoTags([]string{videoId})
-	if err != nil {
-		return nil, err
-	}
-	return tagMap[videoId], nil
 }
