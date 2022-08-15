@@ -19,6 +19,16 @@ func NewMemoController(s *memos.Service) MemoController {
 	return &memoController{service: s}
 }
 
+// @Summary      Retrieve Memo
+// @Description  메모 조회
+// @Tags         memos
+// @Accept       json
+// @Produce      json
+// @Param memoID path string true "memoID to retrieve"
+// @Success      200  {object}   MemoResponse
+// @Failure      404
+// @Failure      500
+// @Router       /memos/{memoID} [get]
 func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 	var resp Response
 
@@ -40,10 +50,19 @@ func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(resp.toMap())
 }
 
+// @Summary      Add Memo
+// @Description  메모 생성
+// @Tags         memos
+// @Accept       json
+// @Produce      json
+// @Param Body body AddRequest true "memo request body"
+// @Success      200  {object}   MemoResponse
+// @Failure      500
+// @Router       /memos/ [post]
 func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 	var resp Response
 
-	req := new(addRequest)
+	req := new(AddRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		return err
 	}
@@ -68,12 +87,21 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusCreated).JSON(resp.toMap())
 }
 
+// @Summary      Update Memo
+// @Description  메모 수정
+// @Tags         memos
+// @Accept       json
+// @Produce      json
+// @Param Body body PatchRequest true "memo request body"
+// @Success      200  {object}   MemoResponse
+// @Failure      500
+// @Router       /memos/ [patch]
 func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 	var resp Response
 
 	id := ctx.Params("memoID")
 
-	req := new(patchRequest)
+	req := new(PatchRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		return err
 	}
@@ -119,12 +147,12 @@ func (c *memoController) handleErrors(err error) error {
 	}
 }
 
-type addRequest struct {
+type AddRequest struct {
 	YoutubeVideoId string `json:"youtubeVideoId"`
 	Body           string `json:"body"`
 }
 
-type patchRequest struct {
+type PatchRequest struct {
 	Body string `json:"body"`
 }
 
