@@ -7,7 +7,7 @@ type Memo struct {
 	DeviceToken    string
 	YoutubeVideoId string
 	Body           string
-	TagIds         []string
+	Tags           []string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }

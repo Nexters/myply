@@ -30,7 +30,7 @@ func (m *MemoData) toEntity() *memos.Memo {
 		DeviceToken:    m.DeviceToken,
 		YoutubeVideoId: m.YoutubeVideoId,
 		Body:           m.Body,
-		TagIds:         m.Tags,
+		Tags:           m.Tags,
 		CreatedAt:      time.Unix(int64(m.CreatedAt.T), 0),
 		UpdatedAt:      time.Unix(int64(m.UpdatedAt.T), 0),
 	}
