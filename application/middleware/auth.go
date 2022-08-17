@@ -56,6 +56,7 @@ func NewAuthMiddleware(memberRepository member.MemberRepository) AuthMiddleware 
 		memberRepository: memberRepository,
 		WhiteList: []string{
 			"POST /api/v1/members/",
+			"GET /api/v1/tags/recommend/",
 		},
 	}
 }
