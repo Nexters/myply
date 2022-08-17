@@ -8,6 +8,7 @@ import (
 
 type MemoController interface {
 	GetMemo(ctx *fiber.Ctx) error
+	GetMemos(ctx *fiber.Ctx) error
 	AddMemo(ctx *fiber.Ctx) error
 	UpdateMemo(ctx *fiber.Ctx) error
 }
@@ -19,6 +20,60 @@ type memoController struct {
 
 func NewMemoController(memoService memos.Service, musicService musics.Service) MemoController {
 	return &memoController{memoService: memoService, musicService: musicService}
+}
+
+type ListMemoData struct {
+	Memos []MemoResponse `json:"memos"`
+}
+
+type ListMemoResponse struct {
+	BaseResponse
+	Data ListMemoData `json:"data"`
+}
+
+// @Summary      Get user's Memo list
+// @Description  내 메모 리스트 조회
+// @Tags         memos
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}   ListMemoResponse
+// @Failure      401
+// @Failure      404
+// @Failure      500
+// @Router       /memos/ [get]
+// @Security ApiKeyAuth
+func (c *memoController) GetMemos(ctx *fiber.Ctx) error {
+	token, err := c.deviceToken(ctx)
+	if err != nil {
+		return err
+	}
+
+	memos, err := c.memoService.GetMemos(token)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	musics, err := c.musicService.GetMusics(memos.YoutubeVideoIDs())
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	memoListResp := []MemoResponse{}
+	for i, memo := range memos {
+		memoListResp = append(memoListResp, MemoResponse{
+			MemoID:       memo.ID,
+			ThumbnailURL: musics[i].ThumbnailURL,
+			Title:        musics[i].Title,
+			Body:         memo.Body,
+			Keywords:     musics[i].YoutubeTags,
+		})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(BaseResponse{
+		Code: Ok,
+		Data: ListMemoData{
+			Memos: memoListResp,
+		},
+	})
 }
 
 // @Summary      Retrieve Memo

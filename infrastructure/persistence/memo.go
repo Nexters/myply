@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var collectionName = "memos"
@@ -64,6 +65,29 @@ func (r *MemoMongoRepository) GetMemo(id string) (*memos.Memo, error) {
 	}
 
 	return md.toEntity(), nil
+}
+
+func (r *MemoMongoRepository) GetMemos(deviceToken string) (memos.Memos, error) {
+
+	coll := r.getCollection()
+	filter := bson.D{{Key: "deviceToken", Value: deviceToken}}
+	opts := options.Find().SetSort(bson.D{{Key: "updatedAt", Value: -1}})
+
+	cursor, err := coll.Find(context.Background(), filter, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	queryResult := []MemoData{}
+	if err = cursor.All(context.Background(), &queryResult); err != nil {
+		return nil, err
+	}
+
+	ms := memos.Memos{}
+	for _, q := range queryResult {
+		ms = append(ms, *q.toEntity())
+	}
+	return ms, nil
 }
 
 func (r *MemoMongoRepository) GetMemoByVideoID(id string) (*memos.Memo, error) {

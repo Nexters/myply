@@ -2,7 +2,9 @@ package clients
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/Nexters/myply/domain/musics"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"google.golang.org/api/option"
 	v3 "google.golang.org/api/youtube/v3"
@@ -62,6 +64,9 @@ func (yc *youtubeClient) GetMusicDetail(videoID string) (*VideoInfo, error) {
 	response, err := call.Do()
 	if err != nil {
 		return nil, err
+	}
+	if len(response.Items) <= 0 {
+		return nil, &musics.NotFoundError{Msg: fmt.Sprintf("youtube music is not found. id=%s", videoID)}
 	}
 
 	result := response.Items[0]

@@ -8,6 +8,7 @@ import (
 
 type Service interface {
 	GetMemo(id string) (*Memo, error)
+	GetMemos(deviceToken string) (Memos, error)
 	AddMemo(videoID string, body string, deviceToken string) (*Memo, error)
 	UpdateBody(id string, body string, deviceToken string) (*Memo, error)
 }
@@ -28,6 +29,14 @@ func (s *memoService) GetMemo(id string) (*Memo, error) {
 	}
 
 	return m, err
+}
+
+func (s *memoService) GetMemos(deviceToken string) (Memos, error) {
+	ms, err := s.repository.GetMemos(deviceToken)
+	if err != nil {
+		return nil, err
+	}
+	return ms, nil
 }
 
 func (s *memoService) AddMemo(videoID string, body string, deviceToken string) (*Memo, error) {
