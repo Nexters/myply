@@ -169,46 +169,6 @@
                         "description": ""
                     }
                 }
-            },
-            "patch": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "메모 수정",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "memos"
-                ],
-                "summary": "Update Memo",
-                "parameters": [
-                    {
-                        "description": "memo request body",
-                        "name": "Body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.PatchRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controller.MemoResponse"
-                        }
-                    },
-                    "500": {
-                        "description": ""
-                    }
-                }
             }
         },
         "/memos/{memoID}": {
@@ -247,6 +207,53 @@
                     },
                     "404": {
                         "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "메모 수정",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "memos"
+                ],
+                "summary": "Update Memo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "memoID to retrieve",
+                        "name": "memoID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "memo request body",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.PatchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.MemoResponse"
+                        }
                     },
                     "500": {
                         "description": ""

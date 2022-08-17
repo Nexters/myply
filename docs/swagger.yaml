@@ -218,31 +218,6 @@ paths:
       tags:
       - members
   /memos/:
-    patch:
-      consumes:
-      - application/json
-      description: 메모 수정
-      parameters:
-      - description: memo request body
-        in: body
-        name: Body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.PatchRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controller.MemoResponse'
-        "500":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Update Memo
-      tags:
-      - memos
     post:
       consumes:
       - application/json
@@ -293,6 +268,36 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Retrieve Memo
+      tags:
+      - memos
+    patch:
+      consumes:
+      - application/json
+      description: 메모 수정
+      parameters:
+      - description: memoID to retrieve
+        in: path
+        name: memoID
+        required: true
+        type: string
+      - description: memo request body
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.PatchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.MemoResponse'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update Memo
       tags:
       - memos
   /musics:

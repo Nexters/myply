@@ -85,10 +85,11 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 // @Tags         memos
 // @Accept       json
 // @Produce      json
+// @Param memoID path string true "memoID to retrieve"
 // @Param Body body PatchRequest true "memo request body"
 // @Success      200  {object}   MemoResponse
 // @Failure      500
-// @Router       /memos/ [patch]
+// @Router       /memos/{memoID} [patch]
 // @Security ApiKeyAuth
 func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 	id := ctx.Params("memoID")
