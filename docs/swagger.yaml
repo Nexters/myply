@@ -4,7 +4,7 @@ definitions:
     properties:
       body:
         type: string
-      youtubeVideoId:
+      youtubeVideoID:
         type: string
     type: object
   controller.BaseResponse:
@@ -12,6 +12,22 @@ definitions:
       code:
         type: integer
       data: {}
+      message:
+        type: string
+    type: object
+  controller.ListMemoData:
+    properties:
+      memos:
+        items:
+          $ref: '#/definitions/controller.MemoResponse'
+        type: array
+    type: object
+  controller.ListMemoResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/controller.ListMemoData'
       message:
         type: string
     type: object
@@ -218,6 +234,28 @@ paths:
       tags:
       - members
   /memos/:
+    get:
+      consumes:
+      - application/json
+      description: 내 메모 리스트 조회
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.ListMemoResponse'
+        "401":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Get user's Memo list
+      tags:
+      - memos
     post:
       consumes:
       - application/json

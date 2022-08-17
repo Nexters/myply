@@ -17,12 +17,12 @@ var collectionName = "memos"
 
 type MemoData struct {
 	ID             primitive.ObjectID  `json:"id" bson:"_id"`
-	DeviceToken    string              `json:"deviceToken"`
-	YoutubeVideoID string              `json:"youtubeVideoId"`
-	Body           string              `json:"body"`
-	Tags           []string            `json:"tags"`
-	CreatedAt      primitive.Timestamp `json:"createdAt"`
-	UpdatedAt      primitive.Timestamp `json:"updatedAt"`
+	DeviceToken    string              `bson:"deviceToken"`
+	YoutubeVideoID string              `bson:"youtubeVideoId"`
+	Body           string              `bson:"body"`
+	Tags           []string            `bson:"tags"`
+	CreatedAt      primitive.Timestamp `bson:"createdAt"`
+	UpdatedAt      primitive.Timestamp `bson:"updatedAt"`
 }
 
 func (m *MemoData) toEntity() *memos.Memo {
@@ -70,7 +70,7 @@ func (r *MemoMongoRepository) GetMemoByVideoID(id string) (*memos.Memo, error) {
 	coll := r.getCollection()
 
 	md := MemoData{}
-	if err := coll.FindOne(context.Background(), bson.M{"youtubeVideoID": id}).Decode(&md); err != nil {
+	if err := coll.FindOne(context.Background(), bson.M{"youtubeVideoId": id}).Decode(&md); err != nil {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
 			return nil, &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. videoID=%s", id)}

@@ -158,7 +158,7 @@ func (c *memoController) handleErrors(err error) error {
 }
 
 type AddRequest struct {
-	YoutubeVideoID string `json:"youtubeVideoId"`
+	YoutubeVideoID string `json:"youtubeVideoID"`
 	Body           string `json:"body"`
 }
 
