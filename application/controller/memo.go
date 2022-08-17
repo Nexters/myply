@@ -31,6 +31,7 @@ func NewMemoController(memoService memos.Service, musicService musics.Service) M
 // @Failure      404
 // @Failure      500
 // @Router       /memos/{memoID} [get]
+// @Security ApiKeyAuth
 func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 	id := ctx.Params("memoID")
 
@@ -55,6 +56,7 @@ func (c *memoController) GetMemo(ctx *fiber.Ctx) error {
 // @Success      200  {object}   MemoResponse
 // @Failure      500
 // @Router       /memos/ [post]
+// @Security ApiKeyAuth
 func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 	req := new(AddRequest)
 	if err := ctx.BodyParser(req); err != nil {
@@ -87,6 +89,7 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 // @Success      200  {object}   MemoResponse
 // @Failure      500
 // @Router       /memos/ [patch]
+// @Security ApiKeyAuth
 func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 	id := ctx.Params("memoID")
 
