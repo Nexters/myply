@@ -14,8 +14,8 @@ import (
 
 type memberData struct {
 	DeviceToken string   `json:"id" bson:"_id"`
-	Name        string   `json:"name"`
-	Keywords    []string `json:"keywords"`
+	Name        string   `bson:"name"`
+	Keywords    []string `bson:"keywords"`
 }
 
 type memberRepository struct {

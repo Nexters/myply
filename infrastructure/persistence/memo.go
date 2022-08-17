@@ -11,18 +11,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var collectionName = "memos"
 
 type MemoData struct {
 	ID             primitive.ObjectID  `json:"id" bson:"_id"`
-	DeviceToken    string              `json:"deviceToken"`
-	YoutubeVideoID string              `json:"youtubeVideoId"`
-	Body           string              `json:"body"`
-	Tags           []string            `json:"tags"`
-	CreatedAt      primitive.Timestamp `json:"createdAt"`
-	UpdatedAt      primitive.Timestamp `json:"updatedAt"`
+	DeviceToken    string              `bson:"deviceToken"`
+	YoutubeVideoID string              `bson:"youtubeVideoId"`
+	Body           string              `bson:"body"`
+	Tags           []string            `bson:"tags"`
+	CreatedAt      primitive.Timestamp `bson:"createdAt"`
+	UpdatedAt      primitive.Timestamp `bson:"updatedAt"`
 }
 
 func (m *MemoData) toEntity() *memos.Memo {
@@ -66,11 +67,34 @@ func (r *MemoMongoRepository) GetMemo(id string) (*memos.Memo, error) {
 	return md.toEntity(), nil
 }
 
+func (r *MemoMongoRepository) GetMemos(deviceToken string) (memos.Memos, error) {
+
+	coll := r.getCollection()
+	filter := bson.D{{Key: "deviceToken", Value: deviceToken}}
+	opts := options.Find().SetSort(bson.D{{Key: "updatedAt", Value: -1}})
+
+	cursor, err := coll.Find(context.Background(), filter, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	queryResult := []MemoData{}
+	if err = cursor.All(context.Background(), &queryResult); err != nil {
+		return nil, err
+	}
+
+	ms := memos.Memos{}
+	for _, q := range queryResult {
+		ms = append(ms, *q.toEntity())
+	}
+	return ms, nil
+}
+
 func (r *MemoMongoRepository) GetMemoByVideoID(id string) (*memos.Memo, error) {
 	coll := r.getCollection()
 
 	md := MemoData{}
-	if err := coll.FindOne(context.Background(), bson.M{"youtubeVideoID": id}).Decode(&md); err != nil {
+	if err := coll.FindOne(context.Background(), bson.M{"youtubeVideoId": id}).Decode(&md); err != nil {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
 			return nil, &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. videoID=%s", id)}

@@ -2,14 +2,18 @@ package clients
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
+	"github.com/Nexters/myply/domain/musics"
 	"github.com/Nexters/myply/infrastructure/configs"
 	"google.golang.org/api/option"
 	v3 "google.golang.org/api/youtube/v3"
 )
 
 var (
-	targetTypes = []string{"video"} // video, channel, playlist
+	targetTypes    = []string{"video"} // video, channel, playlist
+	emptyVideoInfo = VideoInfo{}
 )
 
 const (
@@ -28,13 +32,17 @@ const (
 type TagMap map[string][]string
 
 type VideoInfo struct {
+	VideoID      string
 	ThumbnailURL string
 	Title        string
 	Tags         []string
 }
 
+type VideoInfos []VideoInfo
+
 type YoutubeClient interface {
 	GetMusicDetail(videoID string) (*VideoInfo, error)
+	GetMusics(videoIDs []string) (VideoInfos, error)
 	SearchPlaylist(q string, order string, pageToken string) (*v3.SearchListResponse, error)
 	ParseVideoIds(items []*v3.SearchResult) []string
 	ParseVideoTags(ids []string) (TagMap, error)
@@ -57,15 +65,66 @@ func NewYoutubeClient(config *configs.Config) (YoutubeClient, error) {
 	return &youtubeClient{service}, nil
 }
 
+func (v *VideoInfo) ToEntity() *musics.Music {
+	if v == &emptyVideoInfo {
+		return &musics.EmptyMusic
+	}
+	return &musics.Music{
+		YoutubeVideoID: v.VideoID,
+		ThumbnailURL:   v.ThumbnailURL,
+		Title:          v.Title,
+		YoutubeTags:    v.Tags,
+	}
+}
+
+func (vs *VideoInfos) ToEntity() musics.Musics {
+	ms := musics.Musics{}
+	for _, v := range *vs {
+		ms = append(ms, *v.ToEntity())
+	}
+	return ms
+}
+
+func (yc *youtubeClient) GetMusics(videoIDs []string) (VideoInfos, error) {
+	// The id parameter value is a comma-separated list of YouTube video IDs
+	call := yc.service.Videos.List([]string{"snippet"}).Id(strings.Join(videoIDs, ","))
+	response, err := call.Do()
+	if err != nil {
+		return nil, err
+	}
+	if len(response.Items) <= 0 {
+		return nil, &musics.NotFoundError{Msg: fmt.Sprintf("youtube music is not found. ids=%s", videoIDs)}
+	}
+
+	result := VideoInfos{}
+	for i, v := range response.Items {
+		if v.Id == videoIDs[i] {
+			result = append(result, VideoInfo{
+				VideoID:      v.Id,
+				ThumbnailURL: v.Snippet.Thumbnails.Default.Url,
+				Title:        v.Snippet.Title,
+				Tags:         v.Snippet.Tags,
+			})
+		} else {
+			result = append(result, emptyVideoInfo)
+		}
+	}
+	return result, nil
+}
+
 func (yc *youtubeClient) GetMusicDetail(videoID string) (*VideoInfo, error) {
 	call := yc.service.Videos.List([]string{"snippet"}).Id(videoID)
 	response, err := call.Do()
 	if err != nil {
 		return nil, err
 	}
+	if len(response.Items) <= 0 {
+		return nil, &musics.NotFoundError{Msg: fmt.Sprintf("youtube music is not found. id=%s", videoID)}
+	}
 
 	result := response.Items[0]
 	return &VideoInfo{
+		VideoID:      videoID,
 		ThumbnailURL: result.Snippet.Thumbnails.Default.Url,
 		Title:        result.Snippet.Title,
 		Tags:         result.Snippet.Tags,

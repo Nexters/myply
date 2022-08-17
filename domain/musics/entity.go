@@ -2,6 +2,10 @@ package musics
 
 import "fmt"
 
+var (
+	EmptyMusic = Music{}
+)
+
 type Music struct {
 	YoutubeVideoID string
 	ThumbnailURL   string

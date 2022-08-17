@@ -46,16 +46,11 @@ func (m *MusicRepository) buildMusicListResponse(items []*v3.SearchResult, nextP
 }
 
 func (m *MusicRepository) GetMusic(videoID string) (*musics.Music, error) {
-	detail, err := m.yc.GetMusicDetail(videoID)
+	videoInfo, err := m.yc.GetMusicDetail(videoID)
 	if err != nil {
 		return nil, err
 	}
-	return &musics.Music{
-		YoutubeVideoID: videoID,
-		ThumbnailURL:   detail.ThumbnailURL,
-		Title:          detail.Title,
-		YoutubeTags:    detail.Tags,
-	}, nil
+	return videoInfo.ToEntity(), nil
 }
 
 func (m *MusicRepository) GetMusicList(q, pageToken string) (musicListResponse *musics.MusicListDto, isCached bool, err error) {
@@ -79,6 +74,14 @@ func (m *MusicRepository) GetMusicList(q, pageToken string) (musicListResponse *
 	}
 
 	return musicListResponse, false, nil
+}
+
+func (m *MusicRepository) GetMusicsByIDs(videoIDs []string) (musics.Musics, error) {
+	videoInfos, err := m.yc.GetMusics(videoIDs)
+	if err != nil {
+		return nil, err
+	}
+	return videoInfos.ToEntity(), nil
 }
 
 func (m *MusicRepository) SaveMusicList(key string, musicList []byte) error {

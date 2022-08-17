@@ -20,11 +20,11 @@ func setup(t *testing.T) (func(t *testing.T), YoutubeClient) {
 
 // TestSearchPlaylist test real youtube api
 func TestSearchPlaylist(t *testing.T) {
+	t.Skip()
 	teardown, youtubeClient := setup(t)
 	defer teardown(t)
 
 	res, _ := youtubeClient.SearchPlaylist("beenzino", "", "")
 
 	t.Logf("%+v", res)
-	t.Fail()
 }

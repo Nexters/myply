@@ -137,6 +137,41 @@ const docTemplate = `{
             }
         },
         "/memos/": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "내 메모 리스트 조회",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "memos"
+                ],
+                "summary": "Get user's Memo list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ListMemoResponse"
+                        }
+                    },
+                    "401": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -393,7 +428,7 @@ const docTemplate = `{
                 "body": {
                     "type": "string"
                 },
-                "youtubeVideoId": {
+                "youtubeVideoID": {
                     "type": "string"
                 }
             }
@@ -405,6 +440,31 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.ListMemoData": {
+            "type": "object",
+            "properties": {
+                "memos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.MemoResponse"
+                    }
+                }
+            }
+        },
+        "controller.ListMemoResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/controller.ListMemoData"
+                },
                 "message": {
                     "type": "string"
                 }
