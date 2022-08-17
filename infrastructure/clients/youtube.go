@@ -27,7 +27,14 @@ const (
 
 type TagMap map[string][]string
 
+type VideoInfo struct {
+	ThumbnailUrl string
+	Title        string
+	Tags         []string
+}
+
 type YoutubeClient interface {
+	GetMusicDetail(videoId string) (*VideoInfo, error)
 	SearchPlaylist(q string, order string, pageToken string) (*v3.SearchListResponse, error)
 	ParseVideoIds(items []*v3.SearchResult) []string
 	ParseVideoTags(ids []string) (TagMap, error)
@@ -48,6 +55,21 @@ func NewYoutubeClient(config *configs.Config) (YoutubeClient, error) {
 		return nil, err
 	}
 	return &youtubeClient{service}, nil
+}
+
+func (yc *youtubeClient) GetMusicDetail(videoId string) (*VideoInfo, error) {
+	call := yc.service.Videos.List([]string{"snippet"}).Id(videoId)
+	response, err := call.Do()
+	if err != nil {
+		return nil, err
+	}
+
+	result := response.Items[0]
+	return &VideoInfo{
+		ThumbnailUrl: result.Snippet.Thumbnails.Default.Url,
+		Title:        result.Snippet.Title,
+		Tags:         result.Snippet.Tags,
+	}, nil
 }
 
 func (yc *youtubeClient) SearchPlaylist(q, order, pageToken string) (*v3.SearchListResponse, error) {

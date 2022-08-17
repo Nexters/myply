@@ -15,27 +15,22 @@ import (
 var collectionName = "memos"
 
 type MemoData struct {
-	ID             primitive.ObjectID   `json:"id" bson:"_id"`
-	DeviceToken    string               `json:"deviceToken"`
-	YoutubeVideoId string               `json:"youtubeVideoId"`
-	Body           string               `json:"body"`
-	TagIds         []primitive.ObjectID `json:"tagIds"`
-	CreatedAt      primitive.Timestamp  `json:"createdAt"`
-	UpdatedAt      primitive.Timestamp  `json:"updatedAt"`
+	ID             primitive.ObjectID  `json:"id" bson:"_id"`
+	DeviceToken    string              `json:"deviceToken"`
+	YoutubeVideoId string              `json:"youtubeVideoId"`
+	Body           string              `json:"body"`
+	Tags           []string            `json:"tags"`
+	CreatedAt      primitive.Timestamp `json:"createdAt"`
+	UpdatedAt      primitive.Timestamp `json:"updatedAt"`
 }
 
 func (m *MemoData) toEntity() *memos.Memo {
-	var tagIds []string
-	for _, id := range m.TagIds {
-		tagIds = append(tagIds, id.Hex())
-	}
-
 	return &memos.Memo{
 		Id:             m.ID.Hex(),
 		DeviceToken:    m.DeviceToken,
 		YoutubeVideoId: m.YoutubeVideoId,
 		Body:           m.Body,
-		TagIds:         tagIds,
+		Tags:           m.Tags,
 		CreatedAt:      time.Unix(int64(m.CreatedAt.T), 0),
 		UpdatedAt:      time.Unix(int64(m.UpdatedAt.T), 0),
 	}
@@ -45,10 +40,8 @@ type MemoMongoRepository struct {
 	conn *mongo.Database
 }
 
-func NewMemoRepository(i *db.MongoInstance) *memos.Repository {
-	var r memos.Repository
-	r = &MemoMongoRepository{conn: i.Db}
-	return &r
+func NewMemoRepository(i *db.MongoInstance) memos.Repository {
+	return &MemoMongoRepository{conn: i.Db}
 }
 
 func (r *MemoMongoRepository) GetMemo(id string) (*memos.Memo, error) {
@@ -88,27 +81,18 @@ func (r *MemoMongoRepository) GetMemoByVideoId(id string) (*memos.Memo, error) {
 	return md.toEntity(), nil
 }
 
-func (r *MemoMongoRepository) AddMemo(deviceToken string, videoId string, body string, tagIds []string) (string, error) {
+func (r *MemoMongoRepository) AddMemo(deviceToken string, videoId string, body string, tags []string) (string, error) {
 	coll := r.getCollection()
 
 	memoId := primitive.NewObjectID()
 	now := r.now()
-
-	var objectTagIds []primitive.ObjectID
-	for _, id := range tagIds {
-		objectId, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			return "", err
-		}
-		objectTagIds = append(objectTagIds, objectId)
-	}
 
 	md := MemoData{
 		ID:             memoId,
 		DeviceToken:    deviceToken,
 		YoutubeVideoId: videoId,
 		Body:           body,
-		TagIds:         objectTagIds, // TODO: change to real data
+		Tags:           tags,
 		CreatedAt:      *now,
 		UpdatedAt:      *now,
 	}
