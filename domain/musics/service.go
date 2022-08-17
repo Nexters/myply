@@ -76,6 +76,5 @@ func (ms *musicService) GetMusic(videoID string) (*Music, error) {
 }
 
 func (ms *musicService) GetMusics(videoIDs []string) (Musics, error) {
-	return Musics{}, nil
-	// return ms.musicRepository.GetMusic(videoID)
+	return ms.musicRepository.GetMusicsByIDs(videoIDs)
 }
