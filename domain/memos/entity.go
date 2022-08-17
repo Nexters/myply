@@ -3,9 +3,9 @@ package memos
 import "time"
 
 type Memo struct {
-	Id             string
+	ID             string
 	DeviceToken    string
-	YoutubeVideoId string
+	YoutubeVideoID string
 	Body           string
 	Tags           []string
 	CreatedAt      time.Time

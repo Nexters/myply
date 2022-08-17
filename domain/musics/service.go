@@ -26,7 +26,7 @@ func (o Order) String() string {
 }
 
 type Service interface {
-	GetMusic(videoId string) (*Music, error)
+	GetMusic(videoID string) (*Music, error)
 	GetMusicList(query string, pageToken string) (*MusicListDto, error)
 	GetPlayListBy(order Order, pageToken string) (*MusicListDto, error)
 }
@@ -70,6 +70,6 @@ func (ms *musicService) GetMusicList(query string, pageToken string) (*MusicList
 	return musics, nil
 }
 
-func (ms *musicService) GetMusic(videoId string) (*Music, error) {
-	return ms.musicRepository.GetMusic(videoId)
+func (ms *musicService) GetMusic(videoID string) (*Music, error) {
+	return ms.musicRepository.GetMusic(videoID)
 }

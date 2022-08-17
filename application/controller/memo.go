@@ -68,7 +68,7 @@ func (c *memoController) AddMemo(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	m, err := c.memoService.AddMemo(req.YoutubeVideoId, req.Body, token)
+	m, err := c.memoService.AddMemo(req.YoutubeVideoID, req.Body, token)
 	if err != nil {
 		return c.handleErrors(err)
 	}
@@ -117,13 +117,13 @@ func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 }
 
 func (c *memoController) generateResponse(memo *memos.Memo, successStatus int32) (Response, error) {
-	music, err := c.musicService.GetMusic(memo.YoutubeVideoId)
+	music, err := c.musicService.GetMusic(memo.YoutubeVideoID)
 	if err != nil {
 		return Response{}, err
 	}
 
 	memoResp := MemoResponse{
-		MemoId:       memo.Id,
+		MemoID:       memo.ID,
 		ThumbnailURL: music.ThumbnailURL,
 		Title:        music.Title,
 		Body:         memo.Body,
@@ -157,7 +157,7 @@ func (c *memoController) handleErrors(err error) error {
 }
 
 type AddRequest struct {
-	YoutubeVideoId string `json:"youtubeVideoId"`
+	YoutubeVideoID string `json:"youtubeVideoId"`
 	Body           string `json:"body"`
 }
 
@@ -166,7 +166,7 @@ type PatchRequest struct {
 }
 
 type MemoResponse struct {
-	MemoId       string   `json:"memoID"`
+	MemoID       string   `json:"memoID"`
 	ThumbnailURL string   `json:"thumbnailURL"`
 	Title        string   `json:"title"`
 	Body         string   `json:"body"`
@@ -175,7 +175,7 @@ type MemoResponse struct {
 
 func (r *MemoResponse) toMap() fiber.Map {
 	return fiber.Map{
-		"memoId":       r.MemoId,
+		"memoId":       r.MemoID,
 		"thumbnailURL": r.ThumbnailURL,
 		"title":        r.Title,
 		"body":         r.Body,

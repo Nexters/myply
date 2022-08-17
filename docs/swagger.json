@@ -131,6 +131,11 @@
         },
         "/memos/": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "메모 생성",
                 "consumes": [
                     "application/json"
@@ -161,11 +166,16 @@
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": ""
                     }
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "메모 수정",
                 "consumes": [
                     "application/json"
@@ -196,13 +206,18 @@
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": ""
                     }
                 }
             }
         },
         "/memos/{memoID}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "메모 조회",
                 "consumes": [
                     "application/json"
@@ -231,10 +246,10 @@
                         }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": ""
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": ""
                     }
                 }
             }
@@ -277,7 +292,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": ""
                     }
                 }
             }
@@ -320,7 +335,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": ""
                     }
                 }
             }
@@ -351,7 +366,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": ""
                     }
                 }
             }

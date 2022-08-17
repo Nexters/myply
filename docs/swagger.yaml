@@ -237,7 +237,9 @@ paths:
           schema:
             $ref: '#/definitions/controller.MemoResponse'
         "500":
-          description: Internal Server Error
+          description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Update Memo
       tags:
       - memos
@@ -260,7 +262,9 @@ paths:
           schema:
             $ref: '#/definitions/controller.MemoResponse'
         "500":
-          description: Internal Server Error
+          description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Add Memo
       tags:
       - memos
@@ -283,9 +287,11 @@ paths:
           schema:
             $ref: '#/definitions/controller.MemoResponse'
         "404":
-          description: Not Found
+          description: ""
         "500":
-          description: Internal Server Error
+          description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Retrieve Memo
       tags:
       - memos
@@ -309,7 +315,7 @@ paths:
           schema:
             $ref: '#/definitions/controller.ListMusicResponse'
         "500":
-          description: Internal Server Error
+          description: ""
       security:
       - ApiKeyAuth: []
       summary: Retrieve music playlist
@@ -335,7 +341,7 @@ paths:
           schema:
             $ref: '#/definitions/controller.ListMusicResponse'
         "500":
-          description: Internal Server Error
+          description: ""
       security:
       - ApiKeyAuth: []
       summary: Search music playlist
@@ -354,7 +360,7 @@ paths:
           schema:
             $ref: '#/definitions/controller.RecommendResponse'
         "500":
-          description: Internal Server Error
+          description: ""
       security:
       - ApiKeyAuth: []
       summary: Get recommended tags

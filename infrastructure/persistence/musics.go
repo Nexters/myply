@@ -45,14 +45,14 @@ func (m *MusicRepository) buildMusicListResponse(items []*v3.SearchResult, nextP
 		Musics: &musicListResponse, NextPageToken: nextPageToken}, nil
 }
 
-func (m *MusicRepository) GetMusic(videoId string) (*musics.Music, error) {
-	detail, err := m.yc.GetMusicDetail(videoId)
+func (m *MusicRepository) GetMusic(videoID string) (*musics.Music, error) {
+	detail, err := m.yc.GetMusicDetail(videoID)
 	if err != nil {
 		return nil, err
 	}
 	return &musics.Music{
-		YoutubeVideoID: videoId,
-		ThumbnailURL:   detail.ThumbnailUrl,
+		YoutubeVideoID: videoID,
+		ThumbnailURL:   detail.ThumbnailURL,
 		Title:          detail.Title,
 		YoutubeTags:    detail.Tags,
 	}, nil

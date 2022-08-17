@@ -2,12 +2,13 @@ package memos
 
 import (
 	"fmt"
+
 	"github.com/Nexters/myply/domain/musics"
 )
 
 type Service interface {
 	GetMemo(id string) (*Memo, error)
-	AddMemo(videoId string, body string, deviceToken string) (*Memo, error)
+	AddMemo(videoID string, body string, deviceToken string) (*Memo, error)
 	UpdateBody(id string, body string, deviceToken string) (*Memo, error)
 }
 
@@ -29,20 +30,20 @@ func (s *memoService) GetMemo(id string) (*Memo, error) {
 	return m, err
 }
 
-func (s *memoService) AddMemo(videoId string, body string, deviceToken string) (*Memo, error) {
-	memo, err := s.repository.GetMemoByVideoId(videoId)
+func (s *memoService) AddMemo(videoID string, body string, deviceToken string) (*Memo, error) {
+	memo, err := s.repository.GetMemoByVideoID(videoID)
 	if memo != nil {
-		return nil, &AlreadyExistsError{Msg: fmt.Sprintf("memo with videoID already exists. videoID=%s", videoId)}
+		return nil, &AlreadyExistsError{Msg: fmt.Sprintf("memo with videoID already exists. videoID=%s", videoID)}
 	}
 
 	switch err.(type) {
 	case *NotFoundError:
-		music, musicErr := s.musicService.GetMusic(videoId)
+		music, musicErr := s.musicService.GetMusic(videoID)
 		if musicErr != nil {
 			return nil, musicErr
 		}
 
-		id, insertErr := s.repository.AddMemo(deviceToken, videoId, body, music.YoutubeTags)
+		id, insertErr := s.repository.AddMemo(deviceToken, videoID, body, music.YoutubeTags)
 		if insertErr != nil {
 			return nil, insertErr
 		}
