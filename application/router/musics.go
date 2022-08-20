@@ -22,5 +22,6 @@ func (mr *musicsRouter) Init(root *fiber.Router) {
 	{
 		musicsRouter.Get("/", mr.musicsController.Retrieve())
 		musicsRouter.Get("/search", mr.musicsController.Search())
+		musicsRouter.Get("/preference", mr.musicsController.Prefer())
 	}
 }
