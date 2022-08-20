@@ -3,7 +3,9 @@ package controller
 import (
 	"errors"
 
+	"github.com/Nexters/myply/domain/member"
 	"github.com/Nexters/myply/domain/musics"
+	"github.com/Nexters/myply/domain/tag"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
@@ -11,15 +13,17 @@ import (
 type MusicController interface {
 	Search() fiber.Handler
 	Retrieve() fiber.Handler
+	Prefer() fiber.Handler
 }
 
 type musicController struct {
 	logger       *zap.SugaredLogger
 	musicService musics.Service
+	tagService   tag.TagService
 }
 
-func NewMusicController(l *zap.SugaredLogger, ms musics.Service) MusicController {
-	return &musicController{logger: l, musicService: ms}
+func NewMusicController(l *zap.SugaredLogger, ms musics.Service, ts tag.TagService) MusicController {
+	return &musicController{logger: l, musicService: ms, tagService: ts}
 }
 
 type Order string
@@ -47,6 +51,10 @@ type SearchQueryParams struct {
 
 type RetrieveQueryParams struct {
 	Order     Order  `query:"order"`
+	NextToken string `query:"nextToken"`
+}
+
+type PreferQueryParams struct {
 	NextToken string `query:"nextToken"`
 }
 
@@ -142,6 +150,51 @@ func (mc *musicController) Retrieve() fiber.Handler {
 		}
 
 		musicListDto, err := mc.musicService.GetPlayListBy(order, p.NextToken)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		var musicList []MusicResponse
+		for _, m := range *musicListDto.Musics {
+			musicList = append(musicList, MusicResponse{
+				YoutubeVideoID: m.YoutubeVideoID,
+				ThumbnailURL:   m.ThumbnailURL,
+				Title:          m.Title,
+				YoutubeTags:    m.YoutubeTags,
+				VideoDeepLink:  m.DeepLink(),
+				IsMemoed:       false, // TODO: memo service
+			})
+		}
+		return ctx.Status(200).JSON(BaseResponse{
+			Code: Ok,
+			Data: ListMusicData{
+				Musics:        musicList,
+				NextPageToken: musicListDto.NextPageToken,
+			},
+		})
+	}
+}
+
+// @Summary      Get my prefer music playlist
+// @Description  내 취향 플레이리스트 조회
+// @Tags         musics
+// @Accept       json
+// @Produce      json
+// @Param payload query PreferQueryParams true "query params"
+// @Success      200  {object}   ListMusicResponse
+// @Failure      500
+// @Router       /musics/preference [get]
+// @Security ApiKeyAuth
+func (mc *musicController) Prefer() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		p := new(RetrieveQueryParams)
+		err := ctx.QueryParser(p)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		member := ctx.Locals("member").(*member.Member)
+		musicListDto, err := mc.musicService.GetMusicList(member.Keywords.ToString(), p.NextToken)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}

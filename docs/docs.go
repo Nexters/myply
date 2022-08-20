@@ -346,6 +346,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/musics/preference": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "내 취향 플레이리스트 조회",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "musics"
+                ],
+                "summary": "Get my prefer music playlist",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "nextToken",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ListMusicResponse"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/musics/search": {
             "get": {
                 "security": [
