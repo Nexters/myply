@@ -255,6 +255,41 @@ const docTemplate = `{
                     }
                 }
             },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "메모 삭제",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "memos"
+                ],
+                "summary": "Delete Memo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "memoID to retrieve",
+                        "name": "memoID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
             "patch": {
                 "security": [
                     {

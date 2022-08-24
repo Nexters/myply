@@ -282,6 +282,28 @@ paths:
       tags:
       - memos
   /memos/{memoID}:
+    delete:
+      consumes:
+      - application/json
+      description: 메모 삭제
+      parameters:
+      - description: memoID to retrieve
+        in: path
+        name: memoID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Memo
+      tags:
+      - memos
     get:
       consumes:
       - application/json

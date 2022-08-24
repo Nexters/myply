@@ -11,6 +11,7 @@ type Service interface {
 	GetMemos(deviceToken string) (Memos, error)
 	AddMemo(videoID string, body string, deviceToken string) (*Memo, error)
 	UpdateBody(id string, body string, deviceToken string) (*Memo, error)
+	DeleteMemo(id string, deviceToken string) error
 }
 
 type memoService struct {
@@ -78,4 +79,20 @@ func (s *memoService) UpdateBody(id string, body string, deviceToken string) (*M
 	}
 
 	return s.GetMemo(id)
+}
+
+func (s *memoService) DeleteMemo(id string, deviceToken string) error {
+	m, err := s.GetMemo(id)
+	if err != nil {
+		return err
+	}
+
+	if m.DeviceToken != deviceToken {
+		return &IllegalDeviceTokenError{Msg: "failed to delete due to invalid device token"}
+	}
+
+	if err = s.repository.DeleteMemo(id); err != nil {
+		return err
+	}
+	return nil
 }

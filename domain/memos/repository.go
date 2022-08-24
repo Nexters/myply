@@ -6,4 +6,5 @@ type Repository interface {
 	AddMemo(deviceToken string, videoID string, body string, tags []string) (string, error)
 	GetMemoByVideoID(id string) (*Memo, error)
 	UpdateBody(id string, body string) error
+	DeleteMemo(id string) error
 }

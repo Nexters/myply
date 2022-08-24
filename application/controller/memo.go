@@ -11,6 +11,7 @@ type MemoController interface {
 	GetMemos(ctx *fiber.Ctx) error
 	AddMemo(ctx *fiber.Ctx) error
 	UpdateMemo(ctx *fiber.Ctx) error
+	DeleteMemo(ctx *fiber.Ctx) error
 }
 
 type memoController struct {
@@ -170,6 +171,31 @@ func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(resp.toMap())
+}
+
+// @Summary      Delete Memo
+// @Description  메모 삭제
+// @Tags         memos
+// @Accept       json
+// @Produce      json
+// @Param memoID path string true "memoID to retrieve"
+// @Success      204
+// @Failure      500
+// @Router       /memos/{memoID} [delete]
+// @Security ApiKeyAuth
+func (c *memoController) DeleteMemo(ctx *fiber.Ctx) error {
+	id := ctx.Params("memoID")
+
+	token, err := c.deviceToken(ctx)
+	if err != nil {
+		return err
+	}
+
+	if err = c.memoService.DeleteMemo(id, token); err != nil {
+		return c.handleErrors(err)
+	}
+
+	return ctx.SendStatus(fiber.StatusNoContent)
 }
 
 func (c *memoController) generateResponse(memo *memos.Memo, successStatus int32) (Response, error) {

@@ -152,6 +152,32 @@ func (r *MemoMongoRepository) UpdateBody(id string, body string) error {
 	return nil
 }
 
+func (r *MemoMongoRepository) DeleteMemo(id string) error {
+	coll := r.getCollection()
+	memoNotFoundErr := &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. id=%s", id)}
+
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	filter := bson.M{"_id": objectID}
+
+	res, err := coll.DeleteOne(context.Background(), filter)
+	if err != nil {
+		switch {
+		case errors.Is(err, mongo.ErrNoDocuments):
+			return memoNotFoundErr
+		default:
+			return err
+		}
+	}
+	// Check if the response is 'nil'
+	if res.DeletedCount == 0 {
+		return memoNotFoundErr
+	}
+	return nil
+}
+
 func (r *MemoMongoRepository) getCollection() *mongo.Collection {
 	return r.conn.Collection(collectionName)
 }
