@@ -231,7 +231,7 @@ type MemoResponse struct {
 
 func (r *MemoResponse) toMap() fiber.Map {
 	return fiber.Map{
-		"memoId":       r.MemoID,
+		"memoID":       r.MemoID,
 		"thumbnailURL": r.ThumbnailURL,
 		"title":        r.Title,
 		"body":         r.Body,
