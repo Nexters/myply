@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	targetTypes    = []string{"video"} // video, channel, playlist
+	targetTypes    = []string{"playlist"} // video, channel, playlist
 	emptyVideoInfo = VideoInfo{}
 )
 
