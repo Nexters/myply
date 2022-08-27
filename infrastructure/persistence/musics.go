@@ -35,7 +35,7 @@ func (m *MusicRepository) buildMusicListResponse(items []*v3.SearchResult, nextP
 		case clients.YoutubeVideoType:
 			musicListResponse[i] = *musics.NewMusic(
 				item.Id.VideoId,
-				item.Snippet.Thumbnails.Default.Url,
+				item.Snippet.Thumbnails.High.Url,
 				item.Snippet.Title,
 				tags[item.Id.VideoId],
 			)
