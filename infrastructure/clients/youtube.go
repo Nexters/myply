@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	targetTypes    = []string{"playlist"} // video, channel, playlist
+	targetTypes    = []string{"video"} // video, channel, playlist
 	emptyVideoInfo = VideoInfo{}
 )
 
@@ -23,10 +23,11 @@ const (
 
 const (
 	videoCategory = "10" // music
-	regionCode    = "kr"
+	regionCode    = "KR"
 	videoDuration = "long" // more than 20m
 	maxResults    = 25
 	defaultOrder  = "relevance"
+	defaultQuery  = "playlist,"
 )
 
 type TagMap map[string][]string
@@ -134,6 +135,9 @@ func (yc *youtubeClient) GetMusicDetail(videoID string) (*VideoInfo, error) {
 func (yc *youtubeClient) SearchPlaylist(q, order, pageToken string) (*v3.SearchListResponse, error) {
 	if order == "" {
 		order = defaultOrder
+	}
+	if q == "" {
+		q = defaultQuery
 	}
 
 	call := yc.service.Search.List([]string{"id, snippet"}).
