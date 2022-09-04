@@ -22,12 +22,13 @@ const (
 )
 
 const (
-	videoCategory = "10" // music
-	regionCode    = "KR"
-	videoDuration = "long" // more than 20m
-	maxResults    = 25
-	defaultOrder  = "relevance"
-	defaultQuery  = "playlist,"
+	videoCategory     = "10" // music
+	regionCode        = "kr"
+	videoDuration     = "long" // more than 20m
+	maxResults        = 25
+	defaultOrder      = "relevance"
+	defaultQuery      = "playlist,"
+	defaultSafeSearch = "strict" // moderate, none, strict
 )
 
 type TagMap map[string][]string
@@ -147,6 +148,7 @@ func (yc *youtubeClient) SearchPlaylist(q, order, pageToken string) (*v3.SearchL
 		PageToken(pageToken). // When pageToken == "", token will be ignored.
 		VideoCategoryId(videoCategory).
 		VideoDuration(videoDuration).
+		SafeSearch(defaultSafeSearch).
 		Order(order).
 		MaxResults(maxResults)
 
