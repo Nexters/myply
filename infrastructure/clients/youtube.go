@@ -27,7 +27,7 @@ const (
 	videoDuration     = "long" // more than 20m
 	maxResults        = 25
 	defaultOrder      = "relevance"
-	defaultQuery      = "playlist,"
+	defaultQuery      = "플레이리스트, playlist"
 	defaultSafeSearch = "strict" // moderate, none, strict
 )
 
