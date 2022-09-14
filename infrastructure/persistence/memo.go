@@ -90,6 +90,22 @@ func (r *MemoMongoRepository) GetMemos(deviceToken string) (memos.Memos, error) 
 	return ms, nil
 }
 
+// GetMemoByUniqueKey returns member's memo with youtubeVideoID and deviceToken
+func (r *MemoMongoRepository) GetMemoByUniqueKey(videoID, deviceToken string) (*memos.Memo, error) {
+	coll := r.getCollection()
+
+	md := MemoData{}
+	if err := coll.FindOne(context.Background(), bson.M{"youtubeVideoId": videoID, "deviceToken": deviceToken}).Decode(&md); err != nil {
+		switch {
+		case errors.Is(err, mongo.ErrNoDocuments):
+			return nil, &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. videoID=%s", videoID)}
+		default:
+			return nil, err
+		}
+	}
+	return md.toEntity(), nil
+}
+
 func (r *MemoMongoRepository) GetMemoByVideoID(id string) (*memos.Memo, error) {
 	coll := r.getCollection()
 
@@ -102,7 +118,6 @@ func (r *MemoMongoRepository) GetMemoByVideoID(id string) (*memos.Memo, error) {
 			return nil, err
 		}
 	}
-
 	return md.toEntity(), nil
 }
 

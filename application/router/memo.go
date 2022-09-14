@@ -24,7 +24,7 @@ func (mr *memoRouter) Init(root *fiber.Router) {
 		memoRouter.Get("/:memoID", mr.controller.GetMemo)
 		memoRouter.Post("/", mr.controller.AddMemo)
 		memoRouter.Patch("/:memoID", mr.controller.UpdateMemo)
-		memoRouter.Delete("/:memoID", mr.controller.DeleteMemo)
+		memoRouter.Delete("/:youtubeVideoID", mr.controller.DeleteMemo)
 	}
 
 }

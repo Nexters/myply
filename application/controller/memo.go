@@ -173,25 +173,25 @@ func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(resp.toMap())
 }
 
-// @Summary      Delete Memo
-// @Description  메모 삭제
+// @Summary      Delete Memo by a youtube video ID
+// @Description  유니크 키인 (Device Token, YoutubeVideoID) 조합으로 메모 삭제
 // @Tags         memos
 // @Accept       json
 // @Produce      json
-// @Param memoID path string true "memoID to retrieve"
+// @Param youtubeVideoID path string true "youtubeVideoID to retrieve"
 // @Success      204
 // @Failure      500
-// @Router       /memos/{memoID} [delete]
+// @Router       /memos/{youtubeVideoID} [delete]
 // @Security ApiKeyAuth
 func (c *memoController) DeleteMemo(ctx *fiber.Ctx) error {
-	id := ctx.Params("memoID")
+	youtubeVideoID := ctx.Params("youtubeVideoID")
 
 	token, err := c.deviceToken(ctx)
 	if err != nil {
 		return err
 	}
 
-	if err = c.memoService.DeleteMemo(id, token); err != nil {
+	if err = c.memoService.DeleteMemo(youtubeVideoID, token); err != nil {
 		return c.handleErrors(err)
 	}
 

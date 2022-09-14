@@ -282,28 +282,6 @@ paths:
       tags:
       - memos
   /memos/{memoID}:
-    delete:
-      consumes:
-      - application/json
-      description: 메모 삭제
-      parameters:
-      - description: memoID to retrieve
-        in: path
-        name: memoID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: ""
-        "500":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Delete Memo
-      tags:
-      - memos
     get:
       consumes:
       - application/json
@@ -358,6 +336,29 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update Memo
+      tags:
+      - memos
+  /memos/{youtubeVideoID}:
+    delete:
+      consumes:
+      - application/json
+      description: 유니크 키인 (Device Token, YoutubeVideoID) 조합으로 메모 삭제
+      parameters:
+      - description: youtubeVideoID to retrieve
+        in: path
+        name: youtubeVideoID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Memo by a youtube video ID
       tags:
       - memos
   /musics:

@@ -255,41 +255,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "메모 삭제",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "memos"
-                ],
-                "summary": "Delete Memo",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "memoID to retrieve",
-                        "name": "memoID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": ""
-                    }
-                }
-            },
             "patch": {
                 "security": [
                     {
@@ -331,6 +296,43 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controller.MemoResponse"
                         }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/memos/{youtubeVideoID}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "유니크 키인 (Device Token, YoutubeVideoID) 조합으로 메모 삭제",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "memos"
+                ],
+                "summary": "Delete Memo by a youtube video ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "youtubeVideoID to retrieve",
+                        "name": "youtubeVideoID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
                     },
                     "500": {
                         "description": ""
