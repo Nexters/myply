@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"github.com/Nexters/myply/domain/memos"
 
 	"github.com/Nexters/myply/domain/member"
 	"github.com/Nexters/myply/domain/musics"
@@ -19,11 +20,12 @@ type MusicController interface {
 type musicController struct {
 	logger       *zap.SugaredLogger
 	musicService musics.Service
+	memoService  memos.Service
 	tagService   tag.TagService
 }
 
-func NewMusicController(l *zap.SugaredLogger, ms musics.Service, ts tag.TagService) MusicController {
-	return &musicController{logger: l, musicService: ms, tagService: ts}
+func NewMusicController(l *zap.SugaredLogger, ms musics.Service, memoService memos.Service, ts tag.TagService) MusicController {
+	return &musicController{logger: l, musicService: ms, memoService: memoService, tagService: ts}
 }
 
 type Order string
@@ -105,15 +107,25 @@ func (mc *musicController) Search() fiber.Handler {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
-		musicList := []MusicResponse{}
+		deviceToken, err := mc.deviceToken(ctx)
+		if err != nil {
+			return err
+		}
+
+		var musicList []MusicResponse
 		for _, m := range *musicListDto.Musics {
+			hasMemo, err := mc.hasMemo(m.YoutubeVideoID, deviceToken)
+			if err != nil {
+				return err
+			}
+
 			musicList = append(musicList, MusicResponse{
 				YoutubeVideoID: m.YoutubeVideoID,
 				ThumbnailURL:   m.ThumbnailURL,
 				Title:          m.Title,
 				YoutubeTags:    m.YoutubeTags,
 				VideoDeepLink:  m.DeepLink(),
-				IsMemoed:       false, // TODO: memo service
+				IsMemoed:       hasMemo,
 			})
 		}
 		return ctx.Status(200).JSON(BaseResponse{
@@ -154,15 +166,25 @@ func (mc *musicController) Retrieve() fiber.Handler {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
+		deviceToken, err := mc.deviceToken(ctx)
+		if err != nil {
+			return err
+		}
+
 		var musicList []MusicResponse
 		for _, m := range *musicListDto.Musics {
+			hasMemo, err := mc.hasMemo(m.YoutubeVideoID, deviceToken)
+			if err != nil {
+				return err
+			}
+
 			musicList = append(musicList, MusicResponse{
 				YoutubeVideoID: m.YoutubeVideoID,
 				ThumbnailURL:   m.ThumbnailURL,
 				Title:          m.Title,
 				YoutubeTags:    m.YoutubeTags,
 				VideoDeepLink:  m.DeepLink(),
-				IsMemoed:       false, // TODO: memo service
+				IsMemoed:       hasMemo,
 			})
 		}
 		return ctx.Status(200).JSON(BaseResponse{
@@ -199,15 +221,25 @@ func (mc *musicController) Prefer() fiber.Handler {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 
+		deviceToken, err := mc.deviceToken(ctx)
+		if err != nil {
+			return err
+		}
+
 		var musicList []MusicResponse
 		for _, m := range *musicListDto.Musics {
+			hasMemo, err := mc.hasMemo(m.YoutubeVideoID, deviceToken)
+			if err != nil {
+				return err
+			}
+
 			musicList = append(musicList, MusicResponse{
 				YoutubeVideoID: m.YoutubeVideoID,
 				ThumbnailURL:   m.ThumbnailURL,
 				Title:          m.Title,
 				YoutubeTags:    m.YoutubeTags,
 				VideoDeepLink:  m.DeepLink(),
-				IsMemoed:       false, // TODO: memo service
+				IsMemoed:       hasMemo,
 			})
 		}
 		return ctx.Status(200).JSON(BaseResponse{
@@ -218,4 +250,25 @@ func (mc *musicController) Prefer() fiber.Handler {
 			},
 		})
 	}
+}
+
+func (mc *musicController) hasMemo(videoId string, deviceToken string) (bool, error) {
+	if _, err := mc.memoService.GetMemoByYoutubeVideoID(videoId, deviceToken); err != nil {
+		switch err.(type) {
+		case *memos.NotFoundError:
+			return false, nil
+		default:
+			return false, err
+		}
+	}
+	return true, nil
+}
+
+func (mc *musicController) deviceToken(ctx *fiber.Ctx) (string, error) {
+	token := ctx.GetReqHeaders()["Device-Token"]
+	if token == "" {
+		return "", fiber.NewError(fiber.StatusBadRequest, "empty device-token")
+	}
+
+	return token, nil
 }
