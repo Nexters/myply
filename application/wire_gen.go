@@ -65,7 +65,7 @@ func New() (*fiber.App, error) {
 	memoRouter := router.NewMemoRouter(memoController)
 	tagRepository := persistence.NewTagRepository()
 	tagService := tag.NewTagService(tagRepository)
-	musicController := controller.NewMusicController(sugaredLogger, service, tagService)
+	musicController := controller.NewMusicController(sugaredLogger, service, memosService, tagService)
 	musicsRouter := router.NewMusicsRouter(musicController)
 	tagController := controller.NewTagController(tagService)
 	tagRouter := router.NewTagRouter(tagController)
