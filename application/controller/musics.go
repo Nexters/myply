@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+
 	"github.com/Nexters/myply/domain/memos"
 
 	"github.com/Nexters/myply/domain/member"
@@ -252,8 +253,8 @@ func (mc *musicController) Prefer() fiber.Handler {
 	}
 }
 
-func (mc *musicController) hasMemo(videoId string, deviceToken string) (bool, error) {
-	if _, err := mc.memoService.GetMemoByYoutubeVideoID(videoId, deviceToken); err != nil {
+func (mc *musicController) hasMemo(videoID string, deviceToken string) (bool, error) {
+	if _, err := mc.memoService.GetMemoByMemoUniqueID(videoID, deviceToken); err != nil {
 		switch err.(type) {
 		case *memos.NotFoundError:
 			return false, nil

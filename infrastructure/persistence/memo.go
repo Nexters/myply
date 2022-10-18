@@ -90,15 +90,25 @@ func (r *MemoMongoRepository) GetMemos(deviceToken string) (memos.Memos, error) 
 	return ms, nil
 }
 
-// GetMemoByUniqueKey returns member's memo with youtubeVideoID and deviceToken
-func (r *MemoMongoRepository) GetMemoByUniqueKey(videoID, deviceToken string) (*memos.Memo, error) {
-	coll := r.getCollection()
+// GetMemoByUniqueKey returns member's memo with (memoID or youtubeVideoID) and deviceToken
+func (r *MemoMongoRepository) GetMemoByUniqueKey(memoOrVideoID, deviceToken string) (*memos.Memo, error) {
+	var query primitive.M
+	if primitive.IsValidObjectID(memoOrVideoID) {
+		uid, err := primitive.ObjectIDFromHex(memoOrVideoID)
+		if err != nil {
+			return nil, err
+		}
+		query = bson.M{"_id": uid, "deviceToken": deviceToken}
+	} else {
+		query = bson.M{"youtubeVideoId": memoOrVideoID, "deviceToken": deviceToken}
+	}
 
+	coll := r.getCollection()
 	md := MemoData{}
-	if err := coll.FindOne(context.Background(), bson.M{"youtubeVideoId": videoID, "deviceToken": deviceToken}).Decode(&md); err != nil {
+	if err := coll.FindOne(context.Background(), query).Decode(&md); err != nil {
 		switch {
 		case errors.Is(err, mongo.ErrNoDocuments):
-			return nil, &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. videoID=%s", videoID)}
+			return nil, &memos.NotFoundError{Msg: fmt.Sprintf("memo is not found. query=%s", query)}
 		default:
 			return nil, err
 		}

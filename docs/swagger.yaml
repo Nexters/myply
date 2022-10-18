@@ -72,6 +72,8 @@ definitions:
         type: string
       title:
         type: string
+      youtubeVideoID:
+        type: string
     type: object
   controller.MusicResponse:
     properties:
@@ -338,15 +340,17 @@ paths:
       summary: Update Memo
       tags:
       - memos
-  /memos/{youtubeVideoID}:
+  /memos/{memoIdOrYoutubeID}:
     delete:
       consumes:
       - application/json
-      description: 유니크 키인 (Device Token, YoutubeVideoID) 조합으로 메모 삭제
+      description: |-
+        1. (Device Token, memo ID) 조합으로 메모 삭제
+        2. (Device Token, YoutubeVideoID) 조합으로 메모 삭제
       parameters:
-      - description: youtubeVideoID to retrieve
+      - description: memoIdOrYoutubeID to get a memo
         in: path
-        name: youtubeVideoID
+        name: memoIdOrYoutubeID
         required: true
         type: string
       produces:
@@ -358,7 +362,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Delete Memo by a youtube video ID
+      summary: Delete Memo by a unique id (memo ID or youtube video ID)
       tags:
       - memos
   /musics:

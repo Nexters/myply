@@ -8,11 +8,11 @@ import (
 
 type Service interface {
 	GetMemo(id string) (*Memo, error)
-	GetMemoByYoutubeVideoID(videoID, deviceToken string) (*Memo, error)
+	GetMemoByMemoUniqueID(unqID, deviceToken string) (*Memo, error)
 	GetMemos(deviceToken string) (Memos, error)
 	AddMemo(videoID string, body string, deviceToken string) (*Memo, error)
 	UpdateBody(id string, body string, deviceToken string) (*Memo, error)
-	DeleteMemo(videoID string, deviceToken string) error
+	DeleteMemo(memoIDOrYoutubeID string, deviceToken string) error
 }
 
 type memoService struct {
@@ -42,7 +42,7 @@ func (s *memoService) GetMemos(deviceToken string) (Memos, error) {
 }
 
 func (s *memoService) AddMemo(videoID string, body string, deviceToken string) (*Memo, error) {
-	memo, err := s.GetMemoByYoutubeVideoID(videoID, deviceToken)
+	memo, err := s.GetMemoByMemoUniqueID(videoID, deviceToken)
 	if memo != nil {
 		return nil, &AlreadyExistsError{Msg: fmt.Sprintf("memo with videoID already exists. videoID=%s", videoID)}
 	}
@@ -82,16 +82,16 @@ func (s *memoService) UpdateBody(id string, body string, deviceToken string) (*M
 	return s.GetMemo(id)
 }
 
-func (s *memoService) GetMemoByYoutubeVideoID(videoID, deviceToken string) (*Memo, error) {
-	m, err := s.repository.GetMemoByUniqueKey(videoID, deviceToken)
+func (s *memoService) GetMemoByMemoUniqueID(unqID, deviceToken string) (*Memo, error) {
+	m, err := s.repository.GetMemoByUniqueKey(unqID, deviceToken)
 	if err != nil {
 		return nil, err
 	}
 	return m, err
 }
 
-func (s *memoService) DeleteMemo(videoID string, deviceToken string) error {
-	m, err := s.GetMemoByYoutubeVideoID(videoID, deviceToken)
+func (s *memoService) DeleteMemo(memoIDOrYoutubeID string, deviceToken string) error {
+	m, err := s.GetMemoByMemoUniqueID(memoIDOrYoutubeID, deviceToken)
 	if err != nil {
 		return err
 	}

@@ -62,11 +62,12 @@ func (c *memoController) GetMemos(ctx *fiber.Ctx) error {
 	memoListResp := []MemoResponse{}
 	for i, memo := range memos {
 		memoListResp = append(memoListResp, MemoResponse{
-			MemoID:       memo.ID,
-			ThumbnailURL: musics[i].ThumbnailURL,
-			Title:        musics[i].Title,
-			Body:         memo.Body,
-			Keywords:     musics[i].YoutubeTags,
+			MemoID:         memo.ID,
+			YoutubeVideoID: memo.YoutubeVideoID,
+			ThumbnailURL:   musics[i].ThumbnailURL,
+			Title:          musics[i].Title,
+			Body:           memo.Body,
+			Keywords:       musics[i].YoutubeTags,
 		})
 	}
 	return ctx.Status(fiber.StatusOK).JSON(BaseResponse{
@@ -173,25 +174,26 @@ func (c *memoController) UpdateMemo(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(resp.toMap())
 }
 
-// @Summary      Delete Memo by a youtube video ID
-// @Description  유니크 키인 (Device Token, YoutubeVideoID) 조합으로 메모 삭제
+// @Summary      Delete Memo by a unique id (memo ID or youtube video ID)
+// @Description  1. (Device Token, memo ID) 조합으로 메모 삭제
+// @Description  2. (Device Token, YoutubeVideoID) 조합으로 메모 삭제
 // @Tags         memos
 // @Accept       json
 // @Produce      json
-// @Param youtubeVideoID path string true "youtubeVideoID to retrieve"
+// @Param memoIdOrYoutubeID path string true "memoIdOrYoutubeID to get a memo"
 // @Success      204
 // @Failure      500
-// @Router       /memos/{youtubeVideoID} [delete]
+// @Router       /memos/{memoIdOrYoutubeID} [delete]
 // @Security ApiKeyAuth
 func (c *memoController) DeleteMemo(ctx *fiber.Ctx) error {
-	youtubeVideoID := ctx.Params("youtubeVideoID")
+	memoIDOrYoutubeID := ctx.Params("memoIdOrYoutubeID")
 
 	token, err := c.deviceToken(ctx)
 	if err != nil {
 		return err
 	}
 
-	if err = c.memoService.DeleteMemo(youtubeVideoID, token); err != nil {
+	if err = c.memoService.DeleteMemo(memoIDOrYoutubeID, token); err != nil {
 		return c.handleErrors(err)
 	}
 
@@ -205,11 +207,12 @@ func (c *memoController) generateResponse(memo *memos.Memo, successStatus int32)
 	}
 
 	memoResp := MemoResponse{
-		MemoID:       memo.ID,
-		ThumbnailURL: music.ThumbnailURL,
-		Title:        music.Title,
-		Body:         memo.Body,
-		Keywords:     music.YoutubeTags,
+		MemoID:         memo.ID,
+		YoutubeVideoID: memo.YoutubeVideoID,
+		ThumbnailURL:   music.ThumbnailURL,
+		Title:          music.Title,
+		Body:           memo.Body,
+		Keywords:       music.YoutubeTags,
 	}
 	return Response{
 		code:    successStatus,
@@ -248,19 +251,21 @@ type PatchRequest struct {
 }
 
 type MemoResponse struct {
-	MemoID       string   `json:"memoID"`
-	ThumbnailURL string   `json:"thumbnailURL"`
-	Title        string   `json:"title"`
-	Body         string   `json:"body"`
-	Keywords     []string `json:"keywords"`
+	MemoID         string   `json:"memoID"`
+	YoutubeVideoID string   `json:"youtubeVideoID"`
+	ThumbnailURL   string   `json:"thumbnailURL"`
+	Title          string   `json:"title"`
+	Body           string   `json:"body"`
+	Keywords       []string `json:"keywords"`
 }
 
 func (r *MemoResponse) toMap() fiber.Map {
 	return fiber.Map{
-		"memoID":       r.MemoID,
-		"thumbnailURL": r.ThumbnailURL,
-		"title":        r.Title,
-		"body":         r.Body,
-		"keywords":     r.Keywords,
+		"memoID":          r.MemoID,
+		"YoutubeVideoID:": r.YoutubeVideoID,
+		"thumbnailURL":    r.ThumbnailURL,
+		"title":           r.Title,
+		"body":            r.Body,
+		"keywords":        r.Keywords,
 	}
 }

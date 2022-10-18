@@ -303,14 +303,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/memos/{youtubeVideoID}": {
+        "/memos/{memoIdOrYoutubeID}": {
             "delete": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "유니크 키인 (Device Token, YoutubeVideoID) 조합으로 메모 삭제",
+                "description": "1. (Device Token, memo ID) 조합으로 메모 삭제\n2. (Device Token, YoutubeVideoID) 조합으로 메모 삭제",
                 "consumes": [
                     "application/json"
                 ],
@@ -320,12 +320,12 @@ const docTemplate = `{
                 "tags": [
                     "memos"
                 ],
-                "summary": "Delete Memo by a youtube video ID",
+                "summary": "Delete Memo by a unique id (memo ID or youtube video ID)",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "youtubeVideoID to retrieve",
-                        "name": "youtubeVideoID",
+                        "description": "memoIdOrYoutubeID to get a memo",
+                        "name": "memoIdOrYoutubeID",
                         "in": "path",
                         "required": true
                     }
@@ -606,6 +606,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "youtubeVideoID": {
                     "type": "string"
                 }
             }
